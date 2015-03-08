@@ -44,6 +44,10 @@ public class Document {
 			return 0.0;
 	}
 	
+	public TreeMap<String, Double> getTags() {
+		return tags;
+	}
+	
 	public void printTermCounts() {
 		Iterator<String> iter = termCounts.keySet().iterator();
 		while(iter.hasNext()) {
