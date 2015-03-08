@@ -11,7 +11,7 @@ public class Document {
 	 * term weight is the relative frequency of the term in the document
 	 * term weight = term frequency / numTerms * 100
 	 */
-	private double p = .5;
+	private double p = 1;
 	private TreeMap<String, Integer> termCounts;
 	private TreeMap<String, Double> tags;
 	private int numTerms;
