@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.PriorityQueue;
 
 public class Category {
-	private static final int MAX_NUM_TAGS = 50;
+	private static final int MAX_NUM_TAGS = 25;
 	/*
 	 * rawTagWeights: non-normalized tag weights
 	 * non-normalized tag weight = sum of tag weights from each document
