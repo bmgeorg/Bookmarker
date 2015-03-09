@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.PriorityQueue;
 
 public class Category {
+	private String name;
 	private static final int MAX_NUM_TAGS = 25;
 	/*
 	 * rawTagWeights: non-normalized tag weights
@@ -31,6 +32,24 @@ public class Category {
 				}
 			});
 	private ArrayList<Document> docs = new ArrayList<Document>();
+
+	public Category(String name, String... tags) {
+		assert name != null;
+		assert tags.length <= MAX_NUM_TAGS;
+		this.name = name;
+
+		//add tag raw weights
+		if(tags.length > 0) {
+			double weight = 100.0/tags.length;
+			for(String tag : tags) {
+				rawTagWeights.add(new Tag(tag, weight));
+			}
+		}
+	}
+
+	public String getName() {
+		return name;
+	}
 
 	public Iterator<Tag> tagIterator() {
 		return rawTagWeights.iterator();
@@ -99,7 +118,14 @@ public class Category {
 		System.out.println("document magnitude: " + doc.getMagnitude());
 		if(Math.sqrt(qMagnitude) == 0)
 			return 0.0;
+		System.out.println("Score: " + qdotp/(qMagnitude*doc.getMagnitude()));
 		return qdotp/(qMagnitude*doc.getMagnitude());
+	}
+
+	public void printDocumentURLs() {
+		for(int i = 0; i < docs.size(); i++) {
+			System.out.println(docs.get(i).getURL());
+		}
 	}
 
 	public void printRawTagWeights() {
@@ -112,9 +138,9 @@ public class Category {
 	}
 
 	public static void main(String args[]) throws IOException {
-		Category design = new Category();
-		Document doc1 = new Indexer().index("http://martinfowler.com/articles/designDead.html");
-		Document doc2 = new Indexer().index("http://martinfowler.com/articles/mocksArentStubs.html");
+		Category design = new Category("Design", new String[0]);
+		Document doc1 = new Document("http://martinfowler.com/articles/designDead.html");
+		Document doc2 = new Document("http://martinfowler.com/articles/mocksArentStubs.html");
 
 		design.addDocument(doc2);
 		System.out.println();

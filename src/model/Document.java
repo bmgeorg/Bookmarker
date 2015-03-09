@@ -1,15 +1,46 @@
 package model;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.jsoup.Jsoup;
+
 public class Document {
+	private String url;
 	private Map<String, Integer> termCounts;
+	/*
+	 * numTerms = count of all terms in document, not just count of distinct terms in document
+	 */
 	private int numTerms;
 	/*
 	 * magnitude: the magnitude of the term weight vector in the vector space model
 	 */
 	private double magnitude;
+	
+	public Document(String url) throws IOException {
+		this.url = url;
+		org.jsoup.nodes.Document htmlDoc = Jsoup.connect(url).get();
+		String[] tokens = new Tokenizer().tokenize(htmlDoc.text());
+
+		//count tokens and add to termCounts
+		termCounts = new HashMap<String, Integer>();
+		for(String token : tokens) {
+			int count = 1;
+			if(termCounts.containsKey(token)) {
+				count = termCounts.get(token) + 1;
+			}
+			termCounts.put(token, count);
+		}
+		numTerms = tokens.length;
+		
+		calculateMagnitude();
+	}
+	
+	public String getURL() {
+		return url;
+	}
 	
 	private void calculateMagnitude() {
 		magnitude = 0;
@@ -18,16 +49,6 @@ public class Document {
 			magnitude += Math.pow(weightForTerm(iter.next()), 2);
 		}
 		magnitude = Math.sqrt(magnitude);
-	}
-	
-	/*
-	 * numTerms = count of all terms in document, not just count of distinct terms in document
-	 */
-	public Document(Map<String, Integer> wordCounts, int numTerms) {
-		this.termCounts = wordCounts;
-		this.numTerms = numTerms;
-		
-		calculateMagnitude();
 	}
 	
 	public Iterator<String> termIterator() {
