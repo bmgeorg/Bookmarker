@@ -30,6 +30,6 @@ public class Indexer {
 	}
 	
 	public static void main(String args[]) throws IOException {
-		new Indexer().index("http://martinfowler.com/articles/designDead.html").printTagWeights();
+		new Indexer().index("http://martinfowler.com/articles/designDead.html").printTermWeights();
 	}
 }
