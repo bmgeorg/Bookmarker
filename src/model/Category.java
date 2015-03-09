@@ -48,25 +48,27 @@ public class Category {
 	}
 	
 	public Double score(Document doc) {
+		//take dot product of category tags and document terms
+		//divide by magnitude of category tag weights and magnitude of document term weights
 		Iterator<String> iter = tagIterator();
-		Double dot = 0.0, a = 0.0, b = 0.0;
+		Double dot = 0.0, squaredMagnitude = 0.0;
 		while(iter.hasNext()) {
 			String tag = iter.next();
 			Double catWeight = weightForTag(tag);
 			Double docWeight = doc.weightForTerm(tag);
 			dot += catWeight*docWeight;
-			a += catWeight*catWeight;
-			b += docWeight*docWeight;
+			squaredMagnitude += catWeight*catWeight;
 			System.out.println(tag + ":");
 			System.out.println("category weight: " + catWeight);
 			System.out.println("document weight: " + docWeight);
 		}
 		System.out.println("dot: " + dot);
-		System.out.println("category magnitude: " + Math.sqrt(a));
-		System.out.println("document magnitude: " + Math.sqrt(b));
-		if(Math.sqrt(a) == 0 || Math.sqrt(b) == 0)
+		Double magnitude = Math.sqrt(squaredMagnitude);
+		System.out.println("category magnitude: " + magnitude);
+		System.out.println("document magnitude: " + doc.getMagnitude());
+		if(Math.sqrt(magnitude) == 0)
 			return 0.0;
-		return dot/(Math.sqrt(a)*Math.sqrt(b));
+		return dot/(magnitude*doc.getMagnitude());
 	}
 	
 	public void printRawTagWeights() {
@@ -80,8 +82,8 @@ public class Category {
 	
 	public static void main(String args[]) throws IOException {
 		Category design = new Category();
-		Document doc1 = new Indexer().index("http://martinfowler.com/articles/designDead.html");
-		Document doc2 = new Indexer().index("http://david.heinemeierhansson.com/2014/tdd-is-dead-long-live-testing.html");
+		Document doc1 = new Indexer().index("http://en.wikipedia.org/wiki/Revised_simplex_method");
+		Document doc2 = new Indexer().index("http://en.wikipedia.org/wiki/Linear_programming");
 		System.out.println("Doc1");
 		doc1.printTagWeights();
 		System.out.println("Doc2");

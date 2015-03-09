@@ -15,16 +15,29 @@ public class Document {
 	private TreeMap<String, Integer> termCounts;
 	private TreeMap<String, Double> tags;
 	private int numTerms;
+	/*
+	 * magnitude: the magnitude of the term weight vector in the vector space model
+	 */
+	private double magnitude;
 	
 	private void calculateTags() {
 		tags = new TreeMap<String, Double>();
-		Iterator<String> iter = termCounts.keySet().iterator();
+		Iterator<String> iter = termIterator();
 		while(iter.hasNext()) {
 			String term = iter.next();
 			Double weight = weightForTerm(term);
 			if(weight > p)
 				tags.put(term, weight);
 		}
+	}
+	
+	private void calculateMagnitude() {
+		magnitude = 0;
+		Iterator<String> iter = termIterator();
+		while(iter.hasNext()) {
+			magnitude += Math.pow(weightForTerm(iter.next()), 2);
+		}
+		magnitude = Math.sqrt(magnitude);
 	}
 	
 	/*
@@ -35,6 +48,11 @@ public class Document {
 		this.numTerms = numTerms;
 		
 		calculateTags();
+		calculateMagnitude();
+	}
+	
+	public Iterator<String> termIterator() {
+		return termCounts.keySet().iterator();
 	}
 		
 	public Double weightForTerm(String term) {
@@ -44,12 +62,16 @@ public class Document {
 			return 0.0;
 	}
 	
+	public Double getMagnitude() {
+		return magnitude;
+	}
+	
 	public TreeMap<String, Double> getTags() {
 		return tags;
 	}
 	
 	public void printTermCounts() {
-		Iterator<String> iter = termCounts.keySet().iterator();
+		Iterator<String> iter = termIterator();
 		while(iter.hasNext()) {
 			String term = iter.next();
 			System.out.print(term);
@@ -58,7 +80,7 @@ public class Document {
 	}
 	
 	public void printTermWeights() {
-		Iterator<String> iter = termCounts.keySet().iterator();
+		Iterator<String> iter = termIterator();
 		while(iter.hasNext()) {
 			String term = iter.next();
 			System.out.print(term);
