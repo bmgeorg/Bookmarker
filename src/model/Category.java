@@ -36,6 +36,13 @@ public class Category {
 		return rawTagWeights.iterator();
 	}
 
+	/*
+	 * Best case running time; O(T*D)
+	 * Worst case running time: O(T*D + T*MAX_NUM_TAGS)
+	 * 
+	 * T = num terms in doc
+	 * D = num documents
+	 */
 	public void addDocument(Document doc) {
 		//add terms in doc as tags if their weights are high enough
 		Iterator<String> iter = doc.termIterator();
@@ -59,6 +66,9 @@ public class Category {
 		docs.add(doc);
 	}
 
+	/*
+	 * Running time: O(MAX_NUM_TAGS)
+	 */
 	public Double score(Document doc) {
 		/*
 		 * Let q be vector of category tag weights
