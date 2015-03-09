@@ -1,13 +1,14 @@
 package model;
 
 import java.io.IOException;
-import java.util.TreeMap;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.jsoup.Jsoup;
 
 public class Indexer {
 	private org.jsoup.nodes.Document htmlDoc;
-	private TreeMap<String, Integer> wordCounts;
+	private Map<String, Integer> wordCounts;
 	private String[] tokens;
 	
 	private void addTerm(String term) {
@@ -22,7 +23,7 @@ public class Indexer {
 	public Document index(String url) throws IOException {
 		htmlDoc = Jsoup.connect(url).get();
 		tokens = new Tokenizer().tokenize(htmlDoc.text());
-		wordCounts = new TreeMap<String, Integer>();
+		wordCounts = new HashMap<String, Integer>();
 		for(String token : tokens) {
 			addTerm(token);
 		}

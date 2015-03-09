@@ -1,10 +1,10 @@
 package model;
 
 import java.util.Iterator;
-import java.util.TreeMap;
+import java.util.Map;
 
 public class Document {
-	private TreeMap<String, Integer> termCounts;
+	private Map<String, Integer> termCounts;
 	private int numTerms;
 	/*
 	 * magnitude: the magnitude of the term weight vector in the vector space model
@@ -23,7 +23,7 @@ public class Document {
 	/*
 	 * numTerms = count of all terms in document, not just count of distinct terms in document
 	 */
-	public Document(TreeMap<String, Integer> wordCounts, int numTerms) {
+	public Document(Map<String, Integer> wordCounts, int numTerms) {
 		this.termCounts = wordCounts;
 		this.numTerms = numTerms;
 		
