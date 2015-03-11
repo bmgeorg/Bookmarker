@@ -44,8 +44,8 @@ public class Bookmarker {
 	public static void main(String args[]) throws IOException {
 		Bookmarker engine = new Bookmarker();
 		Category cat1 = new Category("Linear Programming", "programming", "simplex", "revised", "program");
-		Category cat2 = new Category("Design", new String[]{"design", "user", "elegant", "martin", "fowler"});
-		Category cat3 = new Category("Programming", new String[]{"programming", "program", "compile", "Java", "C", "C++", "Objective-C"});
+		Category cat2 = new Category("Design", "design", "user", "elegant", "martin", "fowler");
+		Category cat3 = new Category("Programming", "programming", "program", "compile", "Java", "C", "C++", "Objective-C");
 		engine.addCategory(cat1);
 		engine.addCategory(cat2);
 		engine.addCategory(cat3);
