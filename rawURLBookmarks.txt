@@ -74,7 +74,7 @@ https://discussions.apple.com/docs/DOC-3353
 http://publib.boulder.ibm.com/infocenter/pseries/v5r3/index.jsp?topic=/com.ibm.aix.cmds/doc/aixcmds4/rm.htm
 http://www.tecmint.com/scp-commands-examples/
 http://www.tecmint.com/35-practical-examples-of-linux-find-command/
-http://web.archive.org/web/20120114184424/http://chargen.matasano.com/chargen/2007/9/7/enough-with-the-rainbow-tables-what-you-need-to-know-about-s.html
+http://chargen.matasano.com/chargen/2007/9/7/enough-with-the-rainbow-tables-what-you-need-to-know-about-s.html
 http://lifehacker.com/what-i-wish-i-knew-when-i-started-my-career-as-a-softwa-1681002791
 https://www.linkedin.com/pulse/how-behave-work-primer-your-first-day-job-jason-calacanis?midToken=AQG6Ok1V4xoLww&trk=eml-b2_content_ecosystem_digest-recommended_articles-200-null&fromEmail=fromEmail&ut=0O8Du8vDgxEmA1
 http://sockpuppet.org/blog/2015/03/06/the-hiring-post/#hate
@@ -164,7 +164,6 @@ https://www.google.com/search?q=how+to+install+ffmpeg+for+linux+12&ie=utf-8&oe=u
 http://linuxers.org/tutorial/how-install-ffmpeg-linux
 http://ffmpeg.org/download.html#LinuxBuilds
 http://en.wikipedia.org/wiki/Bipartite_graph
-place:sort=8&maxResults=10
 https://www.mozilla.org/en-US/firefox/central/
 https://stuaff.clemson.edu/forms/index.php?code=owc4xZXLMEoCnn9
 http://symbolab.com/solver/indefinite-integral-calculator/%5Cint%5Cfrac%7B1%7D%7Bx%5Csqrt%7B-1%2Bx%5E%7B2%7D%7D%7Ddx/?origin=suggestion
@@ -533,8 +532,8 @@ http://linuxers.org/tutorial/how-convert-video-files-various-other-video-formats
 http://honnibal.github.io/spaCy/howworks.html#dependency-parser
 http://protractor.ninja/
 http://www.cplusplus.com/doc/tutorial/arrays/
-http://stackoverflow.com/questions/75191/what-is-an-unsigned-char
 https://launchpad.net/~jon-severinsson/+archive/ubuntu/ffmpeg/+packages?field.name_filter=&field.status_filter=published&field.series_filter=precise
+http://stackoverflow.com/questions/75191/what-is-an-unsigned-char
 http://ffmpeg.org/releases/
 http://how-to.tcwebadmin.com/linux-server/installing-ffmpeg-on-ubuntu-12-04-and-ubuntu-13-10-tested/
 https://trac.ffmpeg.org/wiki/CompilationGuide/Ubuntu
