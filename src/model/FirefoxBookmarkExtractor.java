@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
  * Wades through the junk in a Firefox exported bookmark html page to find the urls
  */
 
-public class FirefoxBookmarkSanitizer {
+public class FirefoxBookmarkExtractor {
 	public static void extractFrom(String inputFile, String outputFile) throws FileNotFoundException, IOException {
 		ArrayList<String> urls = new ArrayList<String>();
 		

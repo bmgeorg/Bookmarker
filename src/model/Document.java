@@ -21,7 +21,7 @@ public class Document {
 	
 	public Document(String url) throws IOException {
 		this.url = url;
-		org.jsoup.nodes.Document htmlDoc = Jsoup.connect(url).get();
+		org.jsoup.nodes.Document htmlDoc = Jsoup.connect(url).userAgent("Mozilla").get();
 		String[] tokens = new Tokenizer().tokenize(htmlDoc.text());
 
 		//count tokens and add to termCounts
