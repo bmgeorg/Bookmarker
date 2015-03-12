@@ -99,7 +99,9 @@ public class TestDataLoader {
 		System.out.println("Categories:");
 		for(Category cat : categories) {
 			System.out.println(cat.getName());
+			System.out.println("tags");
 			cat.printRawTagWeights();
+			System.out.println("urls");
 			cat.printDocumentURLs();
 			System.out.println();
 		}
@@ -108,7 +110,7 @@ public class TestDataLoader {
 	public static void main(String args[]) throws FileNotFoundException, IOException {
 		System.out.println("Here!");
 		TestDataLoader loader = new TestDataLoader();
-		loader.load("src/testDataSet1_3_10_2015/exampleCleanData.txt");
+		loader.load("src/testDataSet1_3_10_2015/smallCleanData.txt");
 		loader.printCategoriesAndBookmarks();
 	}
 }

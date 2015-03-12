@@ -33,7 +33,7 @@ public class Tokenizer {
 	
 	private String sanitize(String token) {
 		//remove all non-alphabetic, non-hypen characters
-		token = token.replaceAll("[^a-zA-Z\\-]", "");
+		token = token.replaceAll("[^a-zA-Z\\-\\+]", "");
 		token = token.toLowerCase();
 		return token;
 	}
