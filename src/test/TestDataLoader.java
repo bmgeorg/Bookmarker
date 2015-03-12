@@ -99,14 +99,16 @@ public class TestDataLoader {
 		System.out.println("Categories:");
 		for(Category cat : categories) {
 			System.out.println(cat.getName());
+			cat.printRawTagWeights();
 			cat.printDocumentURLs();
 			System.out.println();
 		}
 	}
 
 	public static void main(String args[]) throws FileNotFoundException, IOException {
+		System.out.println("Here!");
 		TestDataLoader loader = new TestDataLoader();
-		loader.load("dummyCategorizedBookmarks.txt");
+		loader.load("src/testDataSet1_3_10_2015/exampleCleanData.txt");
 		loader.printCategoriesAndBookmarks();
 	}
 }
