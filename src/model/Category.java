@@ -2,6 +2,7 @@ package model;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.PriorityQueue;
@@ -56,14 +57,14 @@ public class Category {
 	}
 
 	/*
-	 * Best case running time; O(T*D)
-	 * Worst case running time: O(T*D + T*MAX_NUM_TAGS)
-	 * 
 	 * T = num terms in doc
 	 * D = num documents
+	 * 
+	 * Best case running time; O(T*D)
+	 * Worst case running time: O(T*D + T*MAX_NUM_TAGS)
 	 */
 	public void addDocument(Document doc) {
-		//add terms in doc as tags if their weights are high enough
+		//add each term in doc as tag if its cumulative weights is higher than lowest weight of current tag
 		Iterator<String> iter = doc.termIterator();
 		while(iter.hasNext()) {
 			String term = iter.next();
@@ -129,12 +130,45 @@ public class Category {
 	}
 
 	public void printRawTagWeights() {
-		Iterator<Tag> iter = tagIterator();
-		while(iter.hasNext()) {
-			Tag tag = iter.next();
-			System.out.print(tag.getTerm());
-			System.out.println(" " + tag.getWeight());
+		ArrayList<Tag> tags = getSortedTags();
+		for(Tag tag : tags) {
+			System.out.println(tag.getTerm() + ": " + tag.getWeight());
 		}
+	}
+	
+	public void printAdjustedTagWeights() {
+		double mag = getMagnitude();
+		ArrayList<Tag> tags = getSortedTags();
+		for(Tag tag : tags) {
+			System.out.println(tag.getTerm() + ": " + tag.getWeight()/mag);
+		}
+	}
+	
+	private ArrayList<Tag> getSortedTags() {
+		ArrayList<Tag> sortedTags = new ArrayList<Tag>();
+		Iterator<Tag> iter = tagIterator();
+		while(iter.hasNext())
+			sortedTags.add(iter.next());
+		Collections.sort(sortedTags, new Comparator<Tag>() {
+			@Override
+			public int compare(Tag o1, Tag o2) {
+				if(o1.getWeight() > o2.getWeight())
+					return -1;
+				else if(o1.getWeight() < o2.getWeight())
+					return 1;
+				return 0;
+			}
+		});
+		return sortedTags;
+	}
+	
+	//expensive because the magnitude changes often and is not cached
+	private double getMagnitude() {
+		double sqrMagnitude = 0;
+		Iterator<Tag> iter = tagIterator();
+		while(iter.hasNext())
+			sqrMagnitude += Math.pow(iter.next().getWeight(), 2.0);
+		return Math.sqrt(sqrMagnitude);
 	}
 
 	public static void main(String args[]) throws IOException {

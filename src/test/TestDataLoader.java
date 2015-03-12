@@ -100,7 +100,7 @@ public class TestDataLoader {
 		for(Category cat : categories) {
 			System.out.println(cat.getName());
 			System.out.println("tags");
-			cat.printRawTagWeights();
+			cat.printAdjustedTagWeights();
 			System.out.println("urls");
 			cat.printDocumentURLs();
 			System.out.println();
