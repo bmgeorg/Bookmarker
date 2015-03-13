@@ -48,8 +48,8 @@ public class Bookmarker {
 		for(int i = 0; i < categories.size(); i++) {
 			Category cat = categories.get(i);
 			System.out.println(cat.getName());
+			cat.printAdjustedTagWeights();
 			cat.printDocumentURLs();
-			cat.printRawTagWeights();
 			System.out.println();
 		}
 	}

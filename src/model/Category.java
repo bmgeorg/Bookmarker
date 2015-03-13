@@ -113,17 +113,10 @@ public class Category implements Serializable {
 			Double docWeight = doc.weightForTerm(tag.getTerm());
 			qdotp += categoryWeight*docWeight;
 			qSqrMagnitude += categoryWeight*categoryWeight;
-			System.out.println(tag.getTerm() + ":");
-			System.out.println("category weight: " + categoryWeight);
-			System.out.println("document weight: " + docWeight);
 		}
-		System.out.println("dot: " + qdotp);
 		Double qMagnitude = Math.sqrt(qSqrMagnitude);
-		System.out.println("category magnitude: " +qMagnitude);
-		System.out.println("document magnitude: " + doc.getMagnitude());
 		if(Math.sqrt(qMagnitude) == 0)
 			return 0.0;
-		System.out.println("Score: " + qdotp/(qMagnitude*doc.getMagnitude()));
 		return qdotp/(qMagnitude*doc.getMagnitude());
 	}
 

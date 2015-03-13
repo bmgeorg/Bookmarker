@@ -135,7 +135,6 @@ public class DataLoader {
 			String line = br.readLine();
 			while(line != null) {
 				if(!line.equals("")) {
-					System.out.println(line);
 					Document doc = getDoc(line, useCachedDocs);
 					if(doc != null)
 						result.add(doc);
@@ -170,11 +169,8 @@ public class DataLoader {
 		try(BufferedReader br = new BufferedReader(new FileReader(path))) {
 			Category category = readCategory(br);
 			while(category != null) {
-				System.out.println(category.getName());
-				category.printAdjustedTagWeights();
 				categories.add(category);
 				category = readCategory(br);
-				System.out.println();
 			}
 		} catch(IOException e) {
 			e.printStackTrace();
@@ -213,24 +209,19 @@ public class DataLoader {
 		ArrayList<Category> categories = new ArrayList<Category>();
 		String path = dir + fileName;
 		try(BufferedReader br = new BufferedReader(new FileReader(path))) {
-			System.out.println("Loading gold");
 			while(true) {
 				Category category = readCategory(br);
 				//if end of file
 				if(category == null)
 					break;
-				System.out.println(category.getName());
-				category.printAdjustedTagWeights();
 				categories.add(category);
 
 				//read urls
 				String url = br.readLine();
 				while(url != null && !url.equals("")) {
-					System.out.println(url);
 					category.addDocument(getDoc(url, useCachedDocs));
 					url = br.readLine();
 				}
-				System.out.println();
 			}
 		}
 
