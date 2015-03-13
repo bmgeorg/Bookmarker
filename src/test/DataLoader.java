@@ -19,68 +19,169 @@ import model.Tokenizer;
  * Loads category and bookmark data from a .txt file
  */
 public class DataLoader {
-	private static final String pathPrefix = "src/dataSet_1/";
+	private static final String dir = "src/dataSet_1/";
 	private static HashMap<String, Document> docs = null;
 
-	private static Object getCache(String fileName) throws IOException, ClassNotFoundException {
-		String path = pathPrefix + fileName;
+	private static Object getCache(String fileName) throws IOException {
+		String path = dir + fileName;
 		try(FileInputStream f_in = new FileInputStream(path);
 				ObjectInputStream obj_in = new ObjectInputStream(f_in)) {
 			return obj_in.readObject();
 		} catch(FileNotFoundException e) {
 			//the file cache was not found
 			return null;
+		} catch(ClassNotFoundException e) {
+			//this should never happen
+			//if it did, you changed the serialVersionUID for some previously stored object
+			e.printStackTrace();
+			System.exit(1);
+			return null;
 		}
 	}
 
 	private static void createCache(String fileName, Object obj) throws IOException {
-		String path = pathPrefix + fileName;
+		String path = dir + fileName;
 		try(FileOutputStream f_out = new FileOutputStream(path);
 				ObjectOutputStream obj_out = new ObjectOutputStream (f_out)) {
 			obj_out.writeObject(obj);
 		}
 	}
-	
+
+	/*
+	 * reads lines until it reads a non-blank line,
+	 * if line is end of file, returns null
+	 * otherwise, makes that line the Category name,
+	 * reads the next line and tokenizes it for tags
+	 */
+	private static Category readCategory(BufferedReader br) throws IOException {
+		//skip blank lines until you read a categoryName
+		String categoryName = br.readLine();
+		while(categoryName != null && categoryName.equals(""))
+			categoryName = br.readLine();
+		//if end of file
+		if(categoryName == null)
+			return null;
+
+		//get tags
+		String tagsLine = br.readLine();
+		String[] tags = new Tokenizer().tokenize(tagsLine);
+		return new Category(categoryName, tags);
+	}
+
 	@SuppressWarnings("unchecked")
-	public static Document getDoc(String url, boolean useCache) throws ClassNotFoundException, IOException {
+	public static Document getDoc(String url, boolean loadFromCache) throws IOException {
+		//replace https with http to avoid certification storage issues
+		//(?i) is for case-insensitive match
+		url = url.trim().replaceAll("(?i)https", "http");
+
 		//if docs == null, cache hasn't been loaded yet
 		if(docs == null)
 			docs = (HashMap<String, Document>) getCache("docs.obj");
 		//if still null, then cache does not exist
 		if(docs == null)
 			docs = new HashMap<String, Document>();
-		if(useCache) {
+		if(loadFromCache) {
 			if(docs.containsKey(url))
 				return docs.get(url);
 		}
 
-		Document doc = new Document(url);
-		docs.put(url, doc);
-		createCache("docs.obj", docs);
-		return doc;
+		//have to reload document
+		try {
+			Document doc = new Document(url);
+			docs.put(url, doc);
+			createCache("docs.obj", docs);
+			return doc;
+		} catch(org.jsoup.HttpStatusException e) {
+			e.printStackTrace();
+		} catch(java.net.SocketTimeoutException e) {
+			e.printStackTrace();
+		} catch(org.jsoup.UnsupportedMimeTypeException e) {
+			e.printStackTrace();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
-
 	/*
-	 * LOADS MANUALLY LABELED DATA:
+	 * Purpose:
+	 * Loads newline-separated urls from file, creates ArrayList of Documents from urls
 	 * 
 	 * Params:
 	 * fileName:
-	 * 	the name of the data file
-	 * 	Example: cleanData.txt
-	 * useCachedCategories:
-	 * 	if true, the method will look for a .obj file to load the data from. The .obj file must be named exactly the
-	 * 	same as fileName (including fileName's extension), with .obj appended. If the .obj file could not be found,
-	 * 	the method will load data fresh, as if useCachedCategories were equal to false.
-	 * 	Example: if fileName is "cleanData.txt", the method will look for a file called "cleanData.txt.obj"
+	 * 	the name of the data file stored at DataLoader.dir
+	 * 	Example: rawURLS.txt
 	 * useCachedDocs:
-	 * 	if true, the method will look up all documents in a docs.obj cache file instead of indexing docs from Internet.
-	 * 	if useCachedCategories is true and the cached categories file exists, useCachedDocs is ignored.
+	 * 	if true, the method will look up all documents in a docs.obj cache file instead of loading docs from Internet.
+	 *	regardless of useCachedDocs value, the method will store docs in the docs.obj file
 	 * 
+	 * File Format:
+	 * url1
+	 * url2
+	 * url3
+	 * url4
+	 */
+	public static ArrayList<Document> loadDocs(String fileName, boolean useCachedDocs) throws FileNotFoundException, IOException {
+		String path = dir + fileName;
+		ArrayList<Document> result = new ArrayList<Document>();
+		try(BufferedReader br = new BufferedReader(new FileReader(path))) {
+			String line = br.readLine();
+			while(line != null) {
+				System.out.println(line);
+				Document doc = getDoc(line, useCachedDocs);
+				if(doc != null)
+					result.add(doc);
+				line = br.readLine();
+			}
+		}
+		return result;
+	}
+
+	/*
 	 * Purpose:
-	 * For each category, loads category name, category tags, and bookmarks into category ArrayList.
+	 * Loads category names and tags from a file, creates ArrayList of Categories
 	 * 
-	 * Expects category data in the following format:
+	 * Params:
+	 * fileName:
+	 * 	the name of the data file stored at DataLoader.dir
+	 * 	Example: rawURLS.txt
+	 * 
+	 * File Format:
+	 * url1
+	 * url2
+	 * url3
+	 * url4
+	 */
+	public static ArrayList<Category> loadCategories(String fileName) throws FileNotFoundException, IOException {
+		String path = dir + fileName;
+		ArrayList<Category> categories = new ArrayList<Category>();
+		try(BufferedReader br = new BufferedReader(new FileReader(path))) {
+			Category category = readCategory(br);
+			while(category != null) {
+				System.out.println(category.getName());
+				category.printAdjustedTagWeights();
+				categories.add(category);
+				category = readCategory(br);
+				System.out.println();
+			}
+		}
+		return categories;
+	}
+
+	/*
+	 * Purpose:
+	 * Loads manually-labeled category and bookmark data and creates ArrayList of categories with their respective
+	 * bookmarks added.
+	 * For each category, the method loads category name, category tags, and bookmarks into category ArrayList.
+	 * 
+	 * Params:
+	 * fileName:
+	 * 	the name of the data file stored at DataLoader.dir
+	 * 	Example: cleanData.txt
+	 * useCachedDocs:
+	 * 	if true, the method will look up all documents in a docs.obj cache file instead of loading docs from Internet.
+	 *	regardless of useCachedDocs value, the method will store docs in the docs.obj file
+	 * File Format:
 	 * category1Name
 	 * tag1, tag2, tag3
 	 * url1
@@ -93,75 +194,30 @@ public class DataLoader {
 	 * url5
 	 * url6
 	 */
-	public static ArrayList<Category> loadLabeled(String fileName, boolean useCachedCategories, boolean useCachedDocs) throws FileNotFoundException, IOException, ClassNotFoundException {
-		ArrayList<Category> categories;
-		if(useCachedCategories) {
-			@SuppressWarnings("unchecked")
-			ArrayList<Category> cached = (ArrayList<Category>) getCache(fileName+".obj");
-			if(cached != null) {
-				return cached;
-			}
-			//proceed as normal because cached version doesn't exist
-		}
-
-		categories = new ArrayList<Category>();
-		String path = pathPrefix + fileName;
+	public static ArrayList<Category> loadGold(String fileName, boolean useCachedDocs) throws FileNotFoundException, IOException {
+		ArrayList<Category> categories = new ArrayList<Category>();
+		String path = dir + fileName;
 		try(BufferedReader br = new BufferedReader(new FileReader(path))) {
-			System.out.println("Loading labeled data");
+			System.out.println("Loading gold");
 			while(true) {
-				//get category name
-				String categoryName = br.readLine();
-				//skip as many blank lines as necessary
-				while(categoryName != null && categoryName.trim().equals(""))
-					categoryName = br.readLine();
+				Category category = readCategory(br);
 				//if end of file
-				if(categoryName == null)
+				if(category == null)
 					break;
-				categoryName = categoryName.trim();
-
-				System.out.println(categoryName);
-
-				//get tags
-				String tagsLine = br.readLine();
-				//if end of file
-				if(tagsLine == null) {
-					categories.add(new Category(categoryName, ""));
-					break;
-				}
-				String[] tags = new Tokenizer().tokenize(tagsLine);
-				for(String tag :tags)
-					System.out.println(tag);
-				Category category = new Category(categoryName, tags);
+				System.out.println(category.getName());
+				category.printAdjustedTagWeights();
 				categories.add(category);
 
-				//get urls
+				//read urls
 				String url = br.readLine();
-				while(url != null && !url.trim().equals("")) {
+				while(url != null && !url.equals("")) {
 					System.out.println(url);
-					//replace https with http to avoid certification storage issues
-					//(?i) is for case-insensitive match
-					url = url.trim().replaceAll("(?i)https", "http");
-					try {
-						category.addDocument(getDoc(url, useCachedDocs));
-					} catch(org.jsoup.HttpStatusException e) {
-						e.printStackTrace();
-					} catch(java.net.SocketTimeoutException e) {
-						e.printStackTrace();
-					} catch(org.jsoup.UnsupportedMimeTypeException e) {
-						e.printStackTrace();
-					} catch(Exception e) {
-						e.printStackTrace();
-					}
+					category.addDocument(getDoc(url, useCachedDocs));
 					url = br.readLine();
 				}
 				System.out.println();
-				//if end of file
-				if(url == null)
-					break;
 			}
 		}
-		//cache data
-		createCache(fileName + ".obj", categories);
 
 		return categories;
 	}
@@ -180,7 +236,7 @@ public class DataLoader {
 	}
 
 	public static void main(String args[]) throws FileNotFoundException, IOException, ClassNotFoundException {
-		ArrayList<Category> data = DataLoader.loadLabeled("smallCleanData.txt", false, true);
+		ArrayList<Category> data = DataLoader.loadGold("smallGold.txt", true);
 		printCategoriesAndBookmarks(data);
 	}
 }

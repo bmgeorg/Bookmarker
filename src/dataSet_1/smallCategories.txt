@@ -1,0 +1,23 @@
+Unix
+command line, linux, terminal
+
+Version Control
+git, svn
+
+iOS
+mac osx, iphone, ipad, apple, xcode
+
+Databases (SQL)
+sql, mysql
+
+C/C++
+C, C++, programming, pointers
+
+Java
+java, object-oriented, class
+
+Machine Learning
+nlp, natural language processing, task, model, feature
+
+Racquetball
+racquetball, court
