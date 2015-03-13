@@ -1,15 +1,16 @@
 package model;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
 import org.jsoup.Jsoup;
 
-public class Document {
+public class Document implements Serializable {
+	private static final long serialVersionUID = -2054790569435840707L;
 	private String url;
-	private Map<String, Integer> termCounts;
+	private HashMap<String, Integer> termCounts;
 	/*
 	 * numTerms = count of all terms in document, not just count of distinct terms in document
 	 */

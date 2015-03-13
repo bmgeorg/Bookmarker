@@ -1,13 +1,15 @@
 package model;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 
-public class Category {
+public class Category implements Serializable {
+	private static final long serialVersionUID = -456116242689353233L;
 	private String name;
 	private static final int MAX_NUM_TAGS = 25;
 	/*
@@ -20,18 +22,20 @@ public class Category {
 	 * We store rawTagWeights as a min priority queue so we know the minimum element in
 	 * constant time. 
 	 */
+	class TagComparator implements Comparator<Tag>, Serializable {
+		private static final long serialVersionUID = -313406206543899133L;
+		@Override
+		public int compare(Tag o1, Tag o2) {
+			if(o1.getWeight() > o2.getWeight())
+				return 1;
+			else if(o1.getWeight() < o2.getWeight())
+				return -1;
+			else
+				return 0;
+		}
+	}
 	private PriorityQueue<Tag> rawTagWeights =
-			new PriorityQueue<Tag>(MAX_NUM_TAGS, new Comparator<Tag>() {
-				@Override
-				public int compare(Tag o1, Tag o2) {
-					if(o1.getWeight() > o2.getWeight())
-						return 1;
-					else if(o1.getWeight() < o2.getWeight())
-						return -1;
-					else
-						return 0;
-				}
-			});
+			new PriorityQueue<Tag>(MAX_NUM_TAGS, new TagComparator());
 	private ArrayList<Document> docs = new ArrayList<Document>();
 
 	public Category(String name, String... tags) {
