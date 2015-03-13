@@ -22,7 +22,7 @@ public class DataLoader {
 	private static final String dir = "src/dataSet_1/";
 	private static HashMap<String, Document> docs = null;
 
-	private static Object getCache(String fileName) throws IOException {
+	private static Object getCache(String fileName) {
 		String path = dir + fileName;
 		try(FileInputStream f_in = new FileInputStream(path);
 				ObjectInputStream obj_in = new ObjectInputStream(f_in)) {
@@ -30,8 +30,8 @@ public class DataLoader {
 		} catch(FileNotFoundException e) {
 			//the file cache was not found
 			return null;
-		} catch(ClassNotFoundException e) {
-			//this should never happen
+		} catch(IOException | ClassNotFoundException e) {
+			//ClassNotFoundException should never happen
 			//if it did, you changed the serialVersionUID for some previously stored object
 			e.printStackTrace();
 			System.exit(1);
@@ -39,11 +39,14 @@ public class DataLoader {
 		}
 	}
 
-	private static void createCache(String fileName, Object obj) throws IOException {
+	private static void createCache(String fileName, Object obj) {
 		String path = dir + fileName;
 		try(FileOutputStream f_out = new FileOutputStream(path);
 				ObjectOutputStream obj_out = new ObjectOutputStream (f_out)) {
 			obj_out.writeObject(obj);
+		} catch(IOException e) {
+			e.printStackTrace();
+			System.exit(1);
 		}
 	}
 
@@ -53,23 +56,31 @@ public class DataLoader {
 	 * otherwise, makes that line the Category name,
 	 * reads the next line and tokenizes it for tags
 	 */
-	private static Category readCategory(BufferedReader br) throws IOException {
-		//skip blank lines until you read a categoryName
-		String categoryName = br.readLine();
-		while(categoryName != null && categoryName.equals(""))
+	private static Category readCategory(BufferedReader br) {
+		String categoryName = null;
+		String[] tags = null;
+		
+		try {
+			//skip blank lines until you read a categoryName
 			categoryName = br.readLine();
-		//if end of file
-		if(categoryName == null)
-			return null;
+			while(categoryName != null && categoryName.equals(""))
+				categoryName = br.readLine();
+			//if end of file
+			if(categoryName == null)
+				return null;
 
-		//get tags
-		String tagsLine = br.readLine();
-		String[] tags = new Tokenizer().tokenize(tagsLine);
+			//get tags
+			String tagsLine = br.readLine();
+			tags = new Tokenizer().tokenize(tagsLine);
+		} catch(IOException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
 		return new Category(categoryName, tags);
 	}
 
 	@SuppressWarnings("unchecked")
-	public static Document getDoc(String url, boolean loadFromCache) throws IOException {
+	public static Document getDoc(String url, boolean loadFromCache) {
 		//replace https with http to avoid certification storage issues
 		//(?i) is for case-insensitive match
 		url = url.trim().replaceAll("(?i)https", "http");
@@ -91,13 +102,9 @@ public class DataLoader {
 			docs.put(url, doc);
 			createCache("docs.obj", docs);
 			return doc;
-		} catch(org.jsoup.HttpStatusException e) {
-			e.printStackTrace();
-		} catch(java.net.SocketTimeoutException e) {
-			e.printStackTrace();
-		} catch(org.jsoup.UnsupportedMimeTypeException e) {
-			e.printStackTrace();
 		} catch(Exception e) {
+			//could be HttpStatusException or SocketTimeoutException or UnsupportedMimeTypeException or others
+			//we don't really care, just skip the url and keep move on
 			e.printStackTrace();
 		}
 		return null;
@@ -121,7 +128,7 @@ public class DataLoader {
 	 * url3
 	 * url4
 	 */
-	public static ArrayList<Document> loadDocs(String fileName, boolean useCachedDocs) throws FileNotFoundException, IOException {
+	public static ArrayList<Document> loadDocs(String fileName, boolean useCachedDocs) {
 		String path = dir + fileName;
 		ArrayList<Document> result = new ArrayList<Document>();
 		try(BufferedReader br = new BufferedReader(new FileReader(path))) {
@@ -133,6 +140,9 @@ public class DataLoader {
 					result.add(doc);
 				line = br.readLine();
 			}
+		} catch(IOException e) {
+			e.printStackTrace();
+			System.exit(1);
 		}
 		return result;
 	}
@@ -164,6 +174,9 @@ public class DataLoader {
 				category = readCategory(br);
 				System.out.println();
 			}
+		} catch(IOException e) {
+			e.printStackTrace();
+			System.exit(1);
 		}
 		return categories;
 	}
