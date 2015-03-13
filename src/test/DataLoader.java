@@ -59,7 +59,7 @@ public class DataLoader {
 	private static Category readCategory(BufferedReader br) {
 		String categoryName = null;
 		String[] tags = null;
-		
+
 		try {
 			//skip blank lines until you read a categoryName
 			categoryName = br.readLine();
@@ -134,10 +134,12 @@ public class DataLoader {
 		try(BufferedReader br = new BufferedReader(new FileReader(path))) {
 			String line = br.readLine();
 			while(line != null) {
-				System.out.println(line);
-				Document doc = getDoc(line, useCachedDocs);
-				if(doc != null)
-					result.add(doc);
+				if(!line.equals("")) {
+					System.out.println(line);
+					Document doc = getDoc(line, useCachedDocs);
+					if(doc != null)
+						result.add(doc);
+				}
 				line = br.readLine();
 			}
 		} catch(IOException e) {

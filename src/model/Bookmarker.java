@@ -6,12 +6,25 @@ import java.util.ArrayList;
 public class Bookmarker {
 	private ArrayList<Category> categories = new ArrayList<Category>();
 	
+	public void addCategories(ArrayList<Category> newCategories) {
+		for(Category category : newCategories) {
+			categories.add(category);
+		}
+	}
+	
 	public void addCategory(Category newCategory) {
 		categories.add(newCategory);
 	}
 	
-	public Category bookmark(String url) throws IOException {
-		Document doc = new Document(url);
+	public void bookmark(ArrayList<Document> docs) {
+		//stupidly add docs one by one
+		//should do this more smartly eventually (using unsupervised clustering perhaps)
+		for(Document doc : docs) {
+			bookmark(doc);
+		}
+	}
+	
+	public Category bookmark(Document doc) {
 		double bestScore = 0;
 		Category bestCategory = null;
 		for(int i = 0; i < categories.size(); i++) {
@@ -50,12 +63,12 @@ public class Bookmarker {
 		engine.addCategory(cat2);
 		engine.addCategory(cat3);
 		
-		engine.bookmark("http://martinfowler.com/articles/designDead.html");
-		engine.bookmark("http://en.wikipedia.org/wiki/Linear_programming");
-		engine.bookmark("http://en.wikipedia.org/wiki/Revised_simplex_method");
-		engine.bookmark("http://david.heinemeierhansson.com/2014/tdd-is-dead-long-live-testing.html");
-		engine.bookmark("http://stackoverflow.com/questions/1154008/any-way-to-declare-an-array-in-line");
-		engine.bookmark("http://stackoverflow.com/questions/17924999/java-multiple-variable-length-argument");
+		engine.bookmark(new Document("http://martinfowler.com/articles/designDead.html"));
+		engine.bookmark(new Document("http://en.wikipedia.org/wiki/Linear_programming"));
+		engine.bookmark(new Document("http://en.wikipedia.org/wiki/Revised_simplex_method"));
+		engine.bookmark(new Document("http://david.heinemeierhansson.com/2014/tdd-is-dead-long-live-testing.html"));
+		engine.bookmark(new Document("http://stackoverflow.com/questions/1154008/any-way-to-declare-an-array-in-line"));
+		engine.bookmark(new Document("http://stackoverflow.com/questions/17924999/java-multiple-variable-length-argument"));
 		
 		engine.printCategories();
 	}
