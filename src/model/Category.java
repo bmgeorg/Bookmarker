@@ -43,10 +43,18 @@ public class Category implements Serializable {
 		assert tags.length <= MAX_NUM_TAGS;
 		this.name = name;
 
+		String[] nameTokens = new Tokenizer().tokenize(name);
+		int numTags = Math.min(tags.length + nameTokens.length, MAX_NUM_TAGS);
+		String[] combinedTags = new String[numTags];
+		for(int i = 0; i < tags.length; i++)
+			combinedTags[i] = tags[i];
+		for(int i = 0; i + tags.length < numTags; i++)
+			combinedTags[i+tags.length] = nameTokens[i]; 
+
 		//add tag raw weights
-		if(tags.length > 0) {
-			double weight = 100.0/tags.length;
-			for(String tag : tags) {
+		if(numTags > 0) {
+			double weight = 100.0/numTags;
+			for(String tag : combinedTags) {
 				rawTagWeights.add(new Tag(tag, weight));
 			}
 		}
