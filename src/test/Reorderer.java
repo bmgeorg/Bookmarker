@@ -41,6 +41,6 @@ public class Reorderer {
 	}
 	
 	public static void main(String args[]) throws IOException {
-		reorderLines("src/dataSet_1/smallURLs.txt", "src/dataSet_1/smallRandomizedURLs.txt");
+		reorderLines("src/dataSet_1/smallURLs.txt", "src/dataSet_1/smallURLs.txt");
 	}
 }

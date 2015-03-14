@@ -12,7 +12,7 @@ import model.Category;
 import model.Document;
 
 public class Tester {
-	public void printSummary(ArrayList<Category> granite, ArrayList<Category> gold) {
+	private void printSummary(ArrayList<Category> granite, ArrayList<Category> gold) {
 		assert(granite.size() == gold.size());
 		
 		//sort lists
@@ -25,12 +25,12 @@ public class Tester {
 		Collections.sort(granite, catComp);
 		Collections.sort(gold, catComp);
 		
+		int totalTP = 0;
+		int totalNum = 0;
+		
 		for(int i = 0; i < granite.size(); i++) {
-			Category graniteCat = granite.get(i);
-			Category goldCat = gold.get(i);
-			
-			ArrayList<Document> graniteDocs = graniteCat.getDocs();
-			ArrayList<Document> goldDocs = goldCat.getDocs();
+			ArrayList<Document> graniteDocs = granite.get(i).getDocs();
+			ArrayList<Document> goldDocs = gold.get(i).getDocs();
 			
 			//extract sets of urls
 			Set<String> graniteSet = new HashSet<String>();
@@ -43,28 +43,55 @@ public class Tester {
 				goldSet.add(doc.getURL());
 			}
 			
-			System.out.println(graniteCat.getName());
-			printAandB(graniteSet, goldSet, "[TP] ");
-			printAminusB(goldSet, graniteSet, "[FN] ");
-			printAminusB(graniteSet, goldSet, "[FP] ");
+			Set<String> tp = intersect(graniteSet, goldSet);
+			Set<String> fn = minus(goldSet, graniteSet);
+			Set<String> fp = minus(graniteSet, goldSet);
+			
+			totalTP += tp.size();
+			totalNum += graniteSet.size();
+			
+			double recall = 100.0 * tp.size()/(tp.size() + fn.size());
+			double confidence = 100.0 * tp.size()/(tp.size() + fp.size());
+			
+			System.out.println(granite.get(i).getName());
+			System.out.println("Recall: " + String.valueOf(recall));
+			System.out.println("Confidence: " + String.valueOf(confidence));
+			printSet(tp, "[TP] ");
+			printSet(fn, "[FN] ");
+			printSet(fp, "[FP] ");
 			System.out.println();
-		}		
+		}
+		System.out.println();
+		double accuracy = 100.0 * totalTP / totalNum;
+		System.out.println("Num correct: " + String.valueOf(totalTP));
+		System.out.println("Out of: " + String.valueOf(totalNum));
+		System.out.println("Accuracy: " + String.valueOf(accuracy));
 	}
-	public void printAandB(Set<String> a, Set<String> b, String prefix) {
+	public void printSet(Set<String> set, String prefix) {
+		Iterator<String> iter = set.iterator();
+		while(iter.hasNext()) {
+			System.out.println(prefix + iter.next());
+		}
+	}
+	private Set<String> intersect(Set<String> a, Set<String> b) {
+		Set<String> result = new HashSet<String>();
 		Iterator<String> iter = a.iterator();
 		while(iter.hasNext()) {
 			String x = iter.next();
 			if(b.contains(x))
-				System.out.println(prefix + x);
+				result.add(x);
 		}
+		return result;
 	}
-	public void printAminusB(Set<String> a, Set<String> b, String prefix) {
+	private Set<String> minus(Set<String> a, Set<String> b) {
+		Set<String> result = new HashSet<String>();
 		Iterator<String> iter = a.iterator();
 		while(iter.hasNext()) {
 			String x = iter.next();
 			if(!b.contains(x))
-				System.out.println(prefix + x);
+				result.add(x);
 		}
+		return result;
 	}
 
 	public void compare(String goldFile, String categoriesFile, String urlFile) {
