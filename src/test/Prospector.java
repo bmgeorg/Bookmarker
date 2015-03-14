@@ -11,9 +11,10 @@ import model.Bookmarker;
 import model.Category;
 import model.Document;
 
-public class Tester {
-	private void printSummary(ArrayList<Category> granite, ArrayList<Category> gold) {
-		assert(granite.size() == gold.size());
+public class Prospector {
+	
+	private void printSummary(ArrayList<Category> ore, ArrayList<Category> gold) {
+		assert(ore.size() == gold.size());
 		
 		//sort lists
 		Comparator<Category> catComp = new Comparator<Category>() {
@@ -22,38 +23,38 @@ public class Tester {
 				return o1.getName().compareToIgnoreCase(o2.getName());
 			}
 		};
-		Collections.sort(granite, catComp);
+		Collections.sort(ore, catComp);
 		Collections.sort(gold, catComp);
 		
 		int totalTP = 0;
 		int totalNum = 0;
 		
-		for(int i = 0; i < granite.size(); i++) {
-			ArrayList<Document> graniteDocs = granite.get(i).getDocs();
+		for(int i = 0; i < ore.size(); i++) {
+			ArrayList<Document> oreDocs = ore.get(i).getDocs();
 			ArrayList<Document> goldDocs = gold.get(i).getDocs();
 			
 			//extract sets of urls
-			Set<String> graniteSet = new HashSet<String>();
+			Set<String> oreSet = new HashSet<String>();
 			Set<String> goldSet = new HashSet<String>();
 			
-			for(Document doc : graniteDocs) {
-				graniteSet.add(doc.getURL());
+			for(Document doc : oreDocs) {
+				oreSet.add(doc.getURL());
 			}
 			for(Document doc : goldDocs) {
 				goldSet.add(doc.getURL());
 			}
 			
-			Set<String> tp = intersect(graniteSet, goldSet);
-			Set<String> fn = minus(goldSet, graniteSet);
-			Set<String> fp = minus(graniteSet, goldSet);
+			Set<String> tp = intersect(oreSet, goldSet);
+			Set<String> fn = minus(goldSet, oreSet);
+			Set<String> fp = minus(oreSet, goldSet);
 			
 			totalTP += tp.size();
-			totalNum += graniteSet.size();
+			totalNum += oreSet.size();
 			
 			double recall = 100.0 * tp.size()/(tp.size() + fn.size());
 			double confidence = 100.0 * tp.size()/(tp.size() + fp.size());
 			
-			System.out.println(granite.get(i).getName());
+			System.out.println(ore.get(i).getName());
 			System.out.println("Recall: " + String.valueOf(recall));
 			System.out.println("Confidence: " + String.valueOf(confidence));
 			printSet(tp, "[TP] ");
@@ -103,11 +104,11 @@ public class Tester {
 		bookmarker.addCategories(categories);
 		bookmarker.bookmark(docs);
 
-		ArrayList<Category> granite = bookmarker.getCategories();
-		printSummary(granite, gold);
+		ArrayList<Category> ore = bookmarker.getCategories();
+		printSummary(ore, gold);
 	}
 
 	public static void main(String args[]) {
-		new Tester().compare("smallGold.txt", "smallCategories.txt", "smallURLs.txt");
+		new Prospector().compare("smallGold.txt", "smallCategories.txt", "smallURLs.txt");
 	}
 }

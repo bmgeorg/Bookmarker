@@ -39,10 +39,6 @@ public class Document implements Serializable {
 		calculateMagnitude();
 	}
 	
-	public String getURL() {
-		return url;
-	}
-	
 	private void calculateMagnitude() {
 		magnitude = 0;
 		Iterator<String> iter = termIterator();
@@ -50,6 +46,10 @@ public class Document implements Serializable {
 			magnitude += Math.pow(weightForTerm(iter.next()), 2);
 		}
 		magnitude = Math.sqrt(magnitude);
+	}
+	
+	public String getURL() {
+		return url;
 	}
 	
 	public Iterator<String> termIterator() {
