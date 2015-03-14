@@ -6,6 +6,10 @@ import java.util.ArrayList;
 public class Bookmarker {
 	private ArrayList<Category> categories = new ArrayList<Category>();
 	
+	public ArrayList<Category> getCategories() {
+		return categories;
+	}
+	
 	public void addCategories(ArrayList<Category> newCategories) {
 		for(Category category : newCategories) {
 			categories.add(category);

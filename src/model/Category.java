@@ -63,6 +63,10 @@ public class Category implements Serializable {
 	public String getName() {
 		return name;
 	}
+	
+	public ArrayList<Document> getDocs() {
+		return docs;
+	}
 
 	public Iterator<Tag> tagIterator() {
 		return rawTagWeights.iterator();

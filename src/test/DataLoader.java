@@ -163,7 +163,7 @@ public class DataLoader {
 	 * url3
 	 * url4
 	 */
-	public static ArrayList<Category> loadCategories(String fileName) throws FileNotFoundException, IOException {
+	public static ArrayList<Category> loadCategories(String fileName) {
 		String path = dir + fileName;
 		ArrayList<Category> categories = new ArrayList<Category>();
 		try(BufferedReader br = new BufferedReader(new FileReader(path))) {
@@ -205,7 +205,7 @@ public class DataLoader {
 	 * url5
 	 * url6
 	 */
-	public static ArrayList<Category> loadGold(String fileName, boolean useCachedDocs) throws FileNotFoundException, IOException {
+	public static ArrayList<Category> loadGold(String fileName, boolean useCachedDocs) {
 		ArrayList<Category> categories = new ArrayList<Category>();
 		String path = dir + fileName;
 		try(BufferedReader br = new BufferedReader(new FileReader(path))) {
@@ -223,6 +223,9 @@ public class DataLoader {
 					url = br.readLine();
 				}
 			}
+		} catch(IOException e) {
+			e.printStackTrace();
+			System.exit(1);
 		}
 
 		return categories;
