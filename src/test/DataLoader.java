@@ -22,7 +22,7 @@ public class DataLoader {
 	private static final String dir = "src/dataSet_1/";
 	private static HashMap<String, Document> docs = null;
 
-	private static Object getCache(String fileName) {
+	private static Object deserialize(String fileName) {
 		String path = dir + fileName;
 		try(FileInputStream f_in = new FileInputStream(path);
 				ObjectInputStream obj_in = new ObjectInputStream(f_in)) {
@@ -87,16 +87,18 @@ public class DataLoader {
 
 		//if docs == null, cache hasn't been loaded yet
 		if(docs == null)
-			docs = (HashMap<String, Document>) getCache("docs.obj");
+			docs = (HashMap<String, Document>) deserialize("docs.obj");
 		//if still null, then cache does not exist
 		if(docs == null)
 			docs = new HashMap<String, Document>();
+		
+		//load doc from docs.obj
 		if(loadFromCache) {
 			if(docs.containsKey(url))
 				return docs.get(url);
 		}
 
-		//have to reload document
+		//have to reload document from Internet
 		try {
 			Document doc = new Document(url);
 			docs.put(url, doc);
@@ -104,7 +106,7 @@ public class DataLoader {
 			return doc;
 		} catch(Exception e) {
 			//could be HttpStatusException or SocketTimeoutException or UnsupportedMimeTypeException or others
-			//we don't really care, just skip the url and keep move on
+			//we don't really care, just skip the url and move on
 			e.printStackTrace();
 		}
 		return null;
@@ -119,8 +121,9 @@ public class DataLoader {
 	 * 	the name of the data file stored at DataLoader.dir
 	 * 	Example: rawURLS.txt
 	 * useCachedDocs:
-	 * 	if true, the method will look up all documents in a docs.obj cache file instead of loading docs from Internet.
-	 *	regardless of useCachedDocs value, the method will store docs in the docs.obj file
+	 * 	if true, the method will load documents from a "docs.obj" cache file, loading from Internet if document is unfound
+	 * 	in "docs.obj"
+	 *	the method stores docs in the docs.obj file
 	 * 
 	 * File Format:
 	 * url1
@@ -155,13 +158,14 @@ public class DataLoader {
 	 * Params:
 	 * fileName:
 	 * 	the name of the data file stored at DataLoader.dir
-	 * 	Example: rawURLS.txt
+	 * 	Example: smallCategories.txt
 	 * 
 	 * File Format:
-	 * url1
-	 * url2
-	 * url3
-	 * url4
+	 * category1Name
+	 * tag1, tag2, tag3
+	 * 
+	 * category2Name
+	 * tag4, tag5, tag6
 	 */
 	public static ArrayList<Category> loadCategories(String fileName) {
 		String path = dir + fileName;
