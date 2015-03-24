@@ -8,9 +8,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class Reorderer {
+public class LineScrambler {
 	/*
-	 * Randomly reorganizes the lines in file at path
+	 * Randomly reorders the lines in a file
+	 * inFile and outFile can be the same file
 	 */
 	public static void reorderLines(String inFile, String outFile) throws IOException {
 		ArrayList<String> lines = new ArrayList<String>();
