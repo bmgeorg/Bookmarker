@@ -12,65 +12,46 @@ import model.Category;
 import model.Document;
 
 public class Prospector {
+	
+	/*
+	 * The only public method in Prospector
+	 * 
+	 * goldFile holds manually categorized urls
+	 * categoriesFile holds categories and tags (see format in DataLoader loadCategories())
+	 * urlFile holds urls (see format in DataLoader loadDocs())
+	 * 
+	 * Uses Bookmarker object to categorize urls from urlFile into the categories in categoriesFile
+	 * Compares results from Bookmarker with gold data from goldFile
+	 * Returns summary of comparison in a Prospect object
+	 */
+	public Prospect prospect(String goldFile, String categoriesFile, String urlFile) {
+		ArrayList<Category> gold = DataLoader.loadGold(goldFile, true);
 
-	class ProspectSummary {
-		double accuracy;
-		int numCorrect;
-		int totalCount;
-		ArrayList<CategoryProspect> prospects;
-		
-		public String toString() {
-			String result = "";
-			for(CategoryProspect prospect : prospects) {
-				result += prospect.toString() + "\n";
+		ArrayList<Category> categories = DataLoader.loadCategories(categoriesFile);
+		ArrayList<Document> docs = DataLoader.loadDocs("smallURLs.txt", true);
+		Bookmarker bookmarker = new Bookmarker();
+		bookmarker.addCategories(categories);
+		for(Document doc : docs) {
+			bookmarker.bookmark(doc);
+		}
+
+		ArrayList<Category> ore = bookmarker.getCategories();
+
+		//sort ore and gold categories to be in same order
+		Comparator<Category> catComp = new Comparator<Category>() {
+			@Override
+			public int compare(Category o1, Category o2) {
+				return o1.getName().compareToIgnoreCase(o2.getName());
 			}
-			result += toShortString();
-			return result;
-		}
-		
-		public String toShortString() {
-			return	"Num correct: " + String.valueOf(numCorrect) + "\n" +
-					"Out of: " + String.valueOf(totalCount) + "\n" + 
-					"Accuracy: " + String.valueOf(accuracy) + "\n";
-		}
+		};
+		Collections.sort(ore, catComp);
+		Collections.sort(gold, catComp);
+
+		return prospect(ore, gold);
 	}
 
-	class CategoryProspect {
-		String categoryName;
-		double recall;
-		double confidence;
-		Set<String> tp;
-		Set<String> fn;
-		Set<String> fp;
-		
-		public String toString() {
-			String result = "";
-			result += categoryName + "\n";
-			
-			//add true positives
-			for(String s : tp) {
-				result += "[TP] " + s + "\n";
-			}
-			
-			//add false negatives
-			for(String s : fn) {
-				result += "[FN] " + s + "\n";
-			}
-			
-			//add false positives
-			for(String s : fp) {
-				result += "[FP] " + s + "\n";
-			}
-
-			result += "Recall: " + String.valueOf(recall) + "\n";
-			result += "Confidence: " + String.valueOf(confidence) + "\n";
-			
-			return result;
-		}
-	}
-
-	private ProspectSummary prospect(ArrayList<Category> ore, ArrayList<Category> gold) {
-		ProspectSummary summary = new ProspectSummary(); 
+	private Prospect prospect(ArrayList<Category> ore, ArrayList<Category> gold) {
+		Prospect summary = new Prospect(); 
 		summary.numCorrect = 0;
 		summary.totalCount = 0;
 		summary.prospects = new ArrayList<CategoryProspect>();
@@ -127,34 +108,8 @@ public class Prospector {
 		return result;
 	}
 
-	public ProspectSummary prospect(String goldFile, String categoriesFile, String urlFile) {
-		ArrayList<Category> gold = DataLoader.loadGold(goldFile, true);
-
-		ArrayList<Category> categories = DataLoader.loadCategories(categoriesFile);
-		ArrayList<Document> docs = DataLoader.loadDocs("smallURLs.txt", true);
-		Bookmarker bookmarker = new Bookmarker();
-		bookmarker.addCategories(categories);
-		for(Document doc : docs) {
-			bookmarker.bookmark(doc);
-		}
-
-		ArrayList<Category> ore = bookmarker.getCategories();
-
-		//sort ore and gold categories to be in same order
-		Comparator<Category> catComp = new Comparator<Category>() {
-			@Override
-			public int compare(Category o1, Category o2) {
-				return o1.getName().compareToIgnoreCase(o2.getName());
-			}
-		};
-		Collections.sort(ore, catComp);
-		Collections.sort(gold, catComp);
-
-		return prospect(ore, gold);
-	}
-
 	public static void main(String args[]) {
-		ProspectSummary prospect = new Prospector().prospect("smallGold.txt", "smallCategories.txt", "smallURLs.txt");
+		Prospect prospect = new Prospector().prospect("smallGold.txt", "smallCategories.txt", "smallURLs.txt");
 		System.out.println(prospect);
 	}
 }
