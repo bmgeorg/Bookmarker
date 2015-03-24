@@ -127,18 +127,20 @@ public class Prospector {
 		return result;
 	}
 
-	public void prospect(String goldFile, String categoriesFile, String urlFile) {
+	public ProspectSummary prospect(String goldFile, String categoriesFile, String urlFile) {
 		ArrayList<Category> gold = DataLoader.loadGold(goldFile, true);
 
 		ArrayList<Category> categories = DataLoader.loadCategories(categoriesFile);
 		ArrayList<Document> docs = DataLoader.loadDocs("smallURLs.txt", true);
 		Bookmarker bookmarker = new Bookmarker();
 		bookmarker.addCategories(categories);
-		bookmarker.bookmark(docs);
+		for(Document doc : docs) {
+			bookmarker.bookmark(doc);
+		}
 
 		ArrayList<Category> ore = bookmarker.getCategories();
 
-		//sort lists
+		//sort ore and gold categories to be in same order
 		Comparator<Category> catComp = new Comparator<Category>() {
 			@Override
 			public int compare(Category o1, Category o2) {
@@ -148,11 +150,11 @@ public class Prospector {
 		Collections.sort(ore, catComp);
 		Collections.sort(gold, catComp);
 
-		ProspectSummary summary = prospect(ore, gold);
-		System.out.println(summary.toString());
+		return prospect(ore, gold);
 	}
 
 	public static void main(String args[]) {
-		new Prospector().prospect("smallGold.txt", "smallCategories.txt", "smallURLs.txt");
+		ProspectSummary prospect = new Prospector().prospect("smallGold.txt", "smallCategories.txt", "smallURLs.txt");
+		System.out.println(prospect);
 	}
 }

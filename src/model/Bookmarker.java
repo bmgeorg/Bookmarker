@@ -20,14 +20,6 @@ public class Bookmarker {
 		categories.add(newCategory);
 	}
 	
-	public void bookmark(ArrayList<Document> docs) {
-		//stupidly add docs one by one
-		//should do this more smartly eventually (using unsupervised clustering perhaps)
-		for(Document doc : docs) {
-			bookmark(doc);
-		}
-	}
-	
 	public Category bookmark(Document doc) {
 		double bestScore = 0;
 		Category bestCategory = null;
