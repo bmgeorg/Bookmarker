@@ -12,67 +12,99 @@ import model.Category;
 import model.Document;
 
 public class Prospector {
-	
-	private void printSummary(ArrayList<Category> ore, ArrayList<Category> gold) {
-		assert(ore.size() == gold.size());
+
+	class ProspectSummary {
+		double accuracy;
+		int numCorrect;
+		int totalCount;
+		ArrayList<CategoryProspect> prospects;
 		
-		//sort lists
-		Comparator<Category> catComp = new Comparator<Category>() {
-			@Override
-			public int compare(Category o1, Category o2) {
-				return o1.getName().compareToIgnoreCase(o2.getName());
+		public String toString() {
+			String result = "";
+			for(CategoryProspect prospect : prospects) {
+				result += prospect.toString() + "\n";
 			}
-		};
-		Collections.sort(ore, catComp);
-		Collections.sort(gold, catComp);
+			result += toShortString();
+			return result;
+		}
 		
-		int totalTP = 0;
-		int totalNum = 0;
+		public String toShortString() {
+			return	"Num correct: " + String.valueOf(numCorrect) + "\n" +
+					"Out of: " + String.valueOf(totalCount) + "\n" + 
+					"Accuracy: " + String.valueOf(accuracy) + "\n";
+		}
+	}
+
+	class CategoryProspect {
+		String categoryName;
+		double recall;
+		double confidence;
+		Set<String> tp;
+		Set<String> fn;
+		Set<String> fp;
 		
+		public String toString() {
+			String result = "";
+			result += categoryName + "\n";
+			
+			//add true positives
+			for(String s : tp) {
+				result += "[TP] " + s + "\n";
+			}
+			
+			//add false negatives
+			for(String s : fn) {
+				result += "[FN] " + s + "\n";
+			}
+			
+			//add false positives
+			for(String s : fp) {
+				result += "[FP] " + s + "\n";
+			}
+
+			result += "Recall: " + String.valueOf(recall) + "\n";
+			result += "Confidence: " + String.valueOf(confidence) + "\n";
+			
+			return result;
+		}
+	}
+
+	private ProspectSummary prospect(ArrayList<Category> ore, ArrayList<Category> gold) {
+		ProspectSummary summary = new ProspectSummary(); 
+		summary.numCorrect = 0;
+		summary.totalCount = 0;
+		summary.prospects = new ArrayList<CategoryProspect>();
+
 		for(int i = 0; i < ore.size(); i++) {
 			ArrayList<Document> oreDocs = ore.get(i).getDocs();
 			ArrayList<Document> goldDocs = gold.get(i).getDocs();
-			
-			//extract sets of urls
+
+			//extract urls from docs
 			Set<String> oreSet = new HashSet<String>();
 			Set<String> goldSet = new HashSet<String>();
-			
+
 			for(Document doc : oreDocs) {
 				oreSet.add(doc.getURL());
 			}
 			for(Document doc : goldDocs) {
 				goldSet.add(doc.getURL());
 			}
-			
-			Set<String> tp = intersect(oreSet, goldSet);
-			Set<String> fn = minus(goldSet, oreSet);
-			Set<String> fp = minus(oreSet, goldSet);
-			
-			totalTP += tp.size();
-			totalNum += oreSet.size();
-			
-			double recall = 100.0 * tp.size()/(tp.size() + fn.size());
-			double confidence = 100.0 * tp.size()/(tp.size() + fp.size());
-			
-			System.out.println(ore.get(i).getName());
-			System.out.println("Recall: " + String.valueOf(recall));
-			System.out.println("Confidence: " + String.valueOf(confidence));
-			printSet(tp, "[TP] ");
-			printSet(fn, "[FN] ");
-			printSet(fp, "[FP] ");
-			System.out.println();
+
+			CategoryProspect prospect = new CategoryProspect();
+			prospect.tp = intersect(oreSet, goldSet);
+			prospect.fn = minus(goldSet, oreSet);
+			prospect.fp = minus(oreSet, goldSet);
+			prospect.categoryName = ore.get(i).getName();
+			prospect.confidence = 100.0 * prospect.tp.size()/(prospect.tp.size() + prospect.fp.size());
+			prospect.recall = 100.0 * prospect.tp.size()/(prospect.tp.size() + prospect.fn.size());
+			summary.prospects.add(prospect);
+
+			summary.numCorrect += prospect.tp.size();
+			summary.totalCount += oreSet.size();
 		}
-		System.out.println();
-		double accuracy = 100.0 * totalTP / totalNum;
-		System.out.println("Num correct: " + String.valueOf(totalTP));
-		System.out.println("Out of: " + String.valueOf(totalNum));
-		System.out.println("Accuracy: " + String.valueOf(accuracy));
-	}
-	public void printSet(Set<String> set, String prefix) {
-		Iterator<String> iter = set.iterator();
-		while(iter.hasNext()) {
-			System.out.println(prefix + iter.next());
-		}
+		
+		summary.accuracy = (double)summary.numCorrect/summary.totalCount;
+		return summary;
 	}
 	private Set<String> intersect(Set<String> a, Set<String> b) {
 		Set<String> result = new HashSet<String>();
@@ -95,7 +127,7 @@ public class Prospector {
 		return result;
 	}
 
-	public void compare(String goldFile, String categoriesFile, String urlFile) {
+	public void prospect(String goldFile, String categoriesFile, String urlFile) {
 		ArrayList<Category> gold = DataLoader.loadGold(goldFile, true);
 
 		ArrayList<Category> categories = DataLoader.loadCategories(categoriesFile);
@@ -105,10 +137,22 @@ public class Prospector {
 		bookmarker.bookmark(docs);
 
 		ArrayList<Category> ore = bookmarker.getCategories();
-		printSummary(ore, gold);
+
+		//sort lists
+		Comparator<Category> catComp = new Comparator<Category>() {
+			@Override
+			public int compare(Category o1, Category o2) {
+				return o1.getName().compareToIgnoreCase(o2.getName());
+			}
+		};
+		Collections.sort(ore, catComp);
+		Collections.sort(gold, catComp);
+
+		ProspectSummary summary = prospect(ore, gold);
+		System.out.println(summary.toString());
 	}
 
 	public static void main(String args[]) {
-		new Prospector().compare("smallGold.txt", "smallCategories.txt", "smallURLs.txt");
+		new Prospector().prospect("smallGold.txt", "smallCategories.txt", "smallURLs.txt");
 	}
 }
