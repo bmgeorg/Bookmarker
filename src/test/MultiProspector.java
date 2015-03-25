@@ -5,13 +5,13 @@ public class MultiProspector {
 	/*
 	 * Returns summary prospect data over multiple orderings of urls in urlFile
 	 */
-	public ProspectSummary summarizeProspects(String goldFile, String categoriesFile, String urlFile, int numReorderings) {
+	public ProspectSummary summarizeProspects(String goldFile, String categoriesFile, String urlFile, int numReorderings, boolean useCache) {
 		assert numReorderings > 0;
 		
 		//get prospects 
 		Prospect prospects[] = new Prospect[numReorderings];
 		for(int i = 0; i < numReorderings; i++) {
-			prospects[i] = new Prospector().prospect(goldFile, categoriesFile, urlFile, true, true);
+			prospects[i] = new Prospector().prospect(goldFile, categoriesFile, urlFile, true, useCache);
 		}
 		
 		//calculate summary
@@ -38,6 +38,6 @@ public class MultiProspector {
 	}
 	
 	public static void main(String args[]) {
-		System.out.println(new MultiProspector().summarizeProspects("smallGold.txt", "smallCategories.txt", "smallURLs.txt", 500));
+		System.out.println(new MultiProspector().summarizeProspects("gold.txt", "categories.txt", "urls.txt", 10, true));
 	}
 }

@@ -19,7 +19,7 @@ import model.Tokenizer;
  * Loads category and bookmark data from a .txt file
  */
 public class DataLoader {
-	public static final String dataDir = "src/dataSet_1/";
+	public static final String dataDir = "src/smallDataSet/";
 	private static HashMap<String, Document> docs = null;
 
 	private static Object deserialize(String fileName) {
@@ -119,7 +119,7 @@ public class DataLoader {
 	 * Params:
 	 * fileName:
 	 * 	the name of the data file stored at DataLoader.dataDir
-	 * 	Example: rawURLS.txt
+	 * 	Example: urls.txt
 	 * useCachedDocs:
 	 * 	if true, the method will load documents from a "docs.obj" cache file, loading from Internet if document is unfound
 	 * 	in "docs.obj"
@@ -158,7 +158,7 @@ public class DataLoader {
 	 * Params:
 	 * fileName:
 	 * 	the name of the data file stored at DataLoader.dataDir
-	 * 	Example: smallCategories.txt
+	 * 	Example: categories.txt
 	 * 
 	 * File Format:
 	 * category1Name
@@ -192,7 +192,7 @@ public class DataLoader {
 	 * Params:
 	 * fileName:
 	 * 	the name of the data file stored at DataLoader.dataDir
-	 * 	Example: cleanData.txt
+	 * 	Example: gold.txt
 	 * useCachedDocs:
 	 * 	if true, the method will look up all documents in a docs.obj cache file instead of loading docs from Internet.
 	 *	regardless of useCachedDocs value, the method will store docs in the docs.obj file
@@ -251,7 +251,7 @@ public class DataLoader {
 	}
 
 	public static void main(String args[]) throws FileNotFoundException, IOException, ClassNotFoundException {
-		ArrayList<Category> data = DataLoader.loadGold("smallGold.txt", true);
+		ArrayList<Category> data = DataLoader.loadGold("gold.txt", true);
 		printCategoriesAndBookmarks(data);
 	}
 }

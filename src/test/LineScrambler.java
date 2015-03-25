@@ -42,6 +42,6 @@ public class LineScrambler {
 	}
 	
 	public static void main(String args[]) throws IOException {
-		reorderLines("src/dataSet_1/smallURLs.txt", "src/dataSet_1/smallURLs.txt");
+		reorderLines("src/smallDataSet/urls.txt", "src/smallDataSet/urls.txt");
 	}
 }

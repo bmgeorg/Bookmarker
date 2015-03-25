@@ -119,7 +119,7 @@ public class Prospector {
 	}
 
 	public static void main(String args[]) {
-		Prospect prospect = new Prospector().prospect("smallGold.txt", "smallCategories.txt", "smallURLs.txt", false, false);
+		Prospect prospect = new Prospector().prospect("gold.txt", "categories.txt", "urls.txt", false, true);
 		System.out.println(prospect);
 	}
 }
