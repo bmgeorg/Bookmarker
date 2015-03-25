@@ -1,7 +1,6 @@
 package model;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,23 +22,19 @@ public class Tokenizer {
 				stopwords.add(line);
 				line = br.readLine();
 			}
-		} catch (FileNotFoundException e) {
-			System.out.println("Could not find stop words file " + fileName);
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
 	private String sanitize(String token) {
-		//remove all non-alphabetic, non-hypen characters
+		//remove all non-alphabetic, non-hypen, non + characters
 		token = token.replaceAll("[^a-zA-Z\\-\\+]", "");
 		token = token.toLowerCase();
 		return token;
 	}
 	
 	public String[] tokenize(String text) {
-		//result
 		ArrayList<String> tokens = new ArrayList<String>();
 		
 		Pattern pattern = Pattern.compile("\\S+");
