@@ -164,7 +164,7 @@ public class Category implements Serializable {
 	/* testing */
 	public void printDocumentURLs() {
 		for(int i = 0; i < docs.size(); i++) {
-			System.out.println(docs.get(i).getURL());
+			System.out.println(docs.get(i).getBaseURI());
 		}
 	}
 

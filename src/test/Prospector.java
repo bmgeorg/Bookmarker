@@ -75,10 +75,10 @@ public class Prospector {
 			Set<String> goldSet = new HashSet<String>();
 
 			for(Document doc : oreDocs) {
-				oreSet.add(doc.getURL());
+				oreSet.add(doc.getBaseURI());
 			}
 			for(Document doc : goldDocs) {
-				goldSet.add(doc.getURL());
+				goldSet.add(doc.getBaseURI());
 			}
 
 			CategoryProspect prospect = new CategoryProspect();

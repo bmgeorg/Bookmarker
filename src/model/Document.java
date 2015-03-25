@@ -9,18 +9,22 @@ import org.jsoup.Jsoup;
 
 public class Document implements Serializable {
 	private static final long serialVersionUID = -2054790569435840707L;
-	private String url;
+	//the actual base uri of a page (after redirection) retrieved from jsoup doc
+	private String baseURI;
 	private HashMap<String, Integer> termCounts;
 	//numTerms = count of all terms in document, not just count of distinct terms in document
 	private int numTerms;
 	//magnitude: the magnitude of the term weight vector in the vector space model
 	private double magnitude;
+	//the jsoup representation of the Document
+	//eventually we should probably remove this for memory conservation, but it is useful for testing
+	private org.jsoup.nodes.Document jsoupDoc;
 	
-	public Document(String url) throws IOException {
-		this.url = url;
-		//lie and say we are Firefox -- prevents 403 errors, should probably fix eventually
-		org.jsoup.nodes.Document htmlDoc = Jsoup.connect(url).userAgent("Mozilla").get();
-		String[] tokens = new Tokenizer().tokenize(htmlDoc.text());
+	private void setup(org.jsoup.nodes.Document jsoupDoc) {
+		this.baseURI = jsoupDoc.baseUri();
+		this.jsoupDoc = jsoupDoc;
+
+		String[] tokens = new Tokenizer().tokenize(jsoupDoc.text());
 		numTerms = tokens.length;
 
 		//count tokens and add to termCounts
@@ -29,9 +33,8 @@ public class Document implements Serializable {
 			addTermCount(token, 1);
 		}
 		
-		
 		//weight title
-		String[] titleTokens = new Tokenizer().tokenize(htmlDoc.title());
+		String[] titleTokens = new Tokenizer().tokenize(jsoupDoc.title());
 		for(String token : titleTokens) {
 			addTermCount(token, 5);
 		}
@@ -39,8 +42,28 @@ public class Document implements Serializable {
 		calculateMagnitude();
 	}
 	
-	public String getURL() {
-		return url;
+	//load document from network
+	//Note: url may not be the same as Document.baseURI() if url gets redirected
+	public Document(String url) throws IOException {
+		//load page
+		//lie and say we are Firefox -- prevents 403 errors, should probably fix eventually
+		org.jsoup.nodes.Document jsoupDoc = Jsoup.connect(url).userAgent("Mozilla").get();
+		setup(jsoupDoc);
+	}
+	
+	//the actual base uri of a page (after redirection) retrieved from jsoup doc
+	//load document from cached htmlDoc
+	public Document(String html, String baseURI) {
+		org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(html, baseURI);
+		setup(jsoupDoc);
+	}
+	
+	public String getBaseURI() {
+		return baseURI;
+	}
+	
+	public String getHTML() {
+		return jsoupDoc.html();
 	}
 	
 	public Iterator<String> termIterator() {
@@ -99,7 +122,7 @@ public class Document implements Serializable {
 	/* overriden methods */
 	@Override
 	public int hashCode() {
-		return url.hashCode();
+		return baseURI.hashCode();
 	}
 
 	@Override
@@ -111,6 +134,16 @@ public class Document implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		Document other = (Document) obj;
-		return url.equals(other.url);
+		return baseURI.equals(other.baseURI);
+	}
+	
+	public static void main(String args[]) throws IOException {
+		Document doc = new Document("http://www.facebook.com");
+		String html = doc.getHTML();
+		String baseURI = doc.getBaseURI();
+		Document docFromCache = new Document(html, baseURI);
+		System.out.println(html);
+		System.out.println(docFromCache.getHTML());
+		assert(doc.getBaseURI().equals(docFromCache.getBaseURI()));
 	}
 }
