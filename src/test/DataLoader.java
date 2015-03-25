@@ -223,7 +223,9 @@ public class DataLoader {
 				//read urls
 				String url = br.readLine();
 				while(url != null && !url.equals("")) {
-					category.addDocument(getDoc(url, useCachedDocs));
+					Document doc = getDoc(url, useCachedDocs);
+					if(doc != null)
+						category.addDocument(doc);
 					url = br.readLine();
 				}
 			}
