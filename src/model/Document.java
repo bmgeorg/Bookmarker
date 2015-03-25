@@ -1,14 +1,12 @@
 package model;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 
 import org.jsoup.Jsoup;
 
-public class Document implements Serializable {
-	private static final long serialVersionUID = -2054790569435840707L;
+public class Document {
 	//the actual base uri of a page (after redirection) retrieved from jsoup doc
 	private String baseURI;
 	private HashMap<String, Integer> termCounts;
@@ -51,10 +49,9 @@ public class Document implements Serializable {
 		setup(jsoupDoc);
 	}
 	
-	//the actual base uri of a page (after redirection) retrieved from jsoup doc
-	//load document from cached htmlDoc
-	public Document(String html, String baseURI) {
-		org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(html, baseURI);
+	//load document from memento
+	public Document(DocumentMemento memento) {
+		org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(memento.html, memento.baseURI);
 		setup(jsoupDoc);
 	}
 	
@@ -62,8 +59,8 @@ public class Document implements Serializable {
 		return baseURI;
 	}
 	
-	public String getHTML() {
-		return jsoupDoc.html();
+	public DocumentMemento getMemento() {
+		return new DocumentMemento(jsoupDoc.html(), baseURI);
 	}
 	
 	public Iterator<String> termIterator() {
@@ -138,12 +135,10 @@ public class Document implements Serializable {
 	}
 	
 	public static void main(String args[]) throws IOException {
-		Document doc = new Document("http://www.facebook.com");
-		String html = doc.getHTML();
-		String baseURI = doc.getBaseURI();
-		Document docFromCache = new Document(html, baseURI);
-		System.out.println(html);
-		System.out.println(docFromCache.getHTML());
+		Document doc = new Document("http://www.lipsum.com");
+		DocumentMemento memento = doc.getMemento();
+		Document docFromCache = new Document(memento);
+		docFromCache.printTermWeights();
 		assert(doc.getBaseURI().equals(docFromCache.getBaseURI()));
 	}
 }

@@ -13,6 +13,7 @@ import java.util.HashMap;
 
 import model.Category;
 import model.Document;
+import model.DocumentMemento;
 import model.Tokenizer;
 
 /*
@@ -20,7 +21,7 @@ import model.Tokenizer;
  */
 public class DataLoader {
 	public static final String dataDir = "src/smallDataSet/";
-	private static HashMap<String, Document> docs = null;
+	private static HashMap<String, DocumentMemento> docs = null;
 
 	private static Object deserialize(String fileName) {
 		String path = dataDir + fileName;
@@ -39,7 +40,7 @@ public class DataLoader {
 		}
 	}
 
-	private static void createCache(String fileName, Object obj) {
+	private static void serialize(String fileName, Object obj) {
 		String path = dataDir + fileName;
 		try(FileOutputStream f_out = new FileOutputStream(path);
 				ObjectOutputStream obj_out = new ObjectOutputStream (f_out)) {
@@ -87,22 +88,25 @@ public class DataLoader {
 
 		//if docs == null, cache hasn't been loaded yet
 		if(docs == null)
-			docs = (HashMap<String, Document>) deserialize("docs.obj");
+			docs = (HashMap<String, DocumentMemento>) deserialize("docs.obj");
 		//if still null, then cache does not exist
 		if(docs == null)
-			docs = new HashMap<String, Document>();
+			docs = new HashMap<String, DocumentMemento>();
 		
 		//load doc from docs.obj
 		if(loadFromCache) {
-			if(docs.containsKey(url))
-				return docs.get(url);
+			if(docs.containsKey(url)) {
+				DocumentMemento memento = docs.get(url);
+				return new Document(memento);
+			}
 		}
 
 		//have to reload document from Internet
 		try {
+			System.out.println("Loading from network: " + url);
 			Document doc = new Document(url);
-			docs.put(url, doc);
-			createCache("docs.obj", docs);
+			docs.put(url, doc.getMemento());
+			serialize("docs.obj", docs);
 			return doc;
 		} catch(Exception e) {
 			//could be HttpStatusException or SocketTimeoutException or UnsupportedMimeTypeException or others
