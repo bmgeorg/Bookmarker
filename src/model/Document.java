@@ -48,7 +48,7 @@ public class Document implements Serializable {
 	//weight is in [0, 1]
 	public double weightForTerm(String term) {
 		if(termCounts.containsKey(term))
-			return termCounts.get(term)/numTerms;
+			return (double)termCounts.get(term)/numTerms;
 		else
 			return 0.0;
 	}

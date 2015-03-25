@@ -54,7 +54,7 @@ public class Category implements Serializable {
 
 		//add tag raw weights
 		if(numTags > 0) {
-			double weight = 100.0/numTags;
+			double weight = 1.0/numTags;
 			for(String tag : combinedTags) {
 				rawTagWeights.add(new Tag(tag, weight));
 			}
@@ -184,9 +184,12 @@ public class Category implements Serializable {
 	}
 
 	public static void main(String args[]) throws IOException {
-		Category design = new Category("Design", new String[0]);
+		Category design = new Category("Design");
 		Document doc1 = new Document("http://martinfowler.com/articles/designDead.html");
 		Document doc2 = new Document("http://martinfowler.com/articles/mocksArentStubs.html");
+		
+		doc1.printTermWeights();
+		doc2.printTermWeights();
 
 		design.addDocument(doc2);
 		System.out.println();
