@@ -38,6 +38,6 @@ public class MultiProspector {
 	}
 	
 	public static void main(String args[]) {
-		System.out.println(new MultiProspector().summarizeProspects("gold.txt", "categories.txt", "urls.txt", 10, true));
+		System.out.println(new MultiProspector().summarizeProspects("gold.txt", "categories.txt", "urls.txt", 500, true));
 	}
 }

@@ -1,0 +1,19 @@
+smallDataSet
+
+1.0
+Params: MAX_NUM_TAGS = 15
+Runs: 500
+Average: 0.80
+Standard dev: 0.06
+Min: 0.52
+Max: 0.92
+
+1.0 - title weighting
+Params: MAX_NUM_TAGS = 15, Title weight = +3
+Runs: 500
+Average: 0.79
+Standard dev: 0.06
+Min: 0.43
+Max: 0.94
+Notes:
+Title weighting hurt average accuracy

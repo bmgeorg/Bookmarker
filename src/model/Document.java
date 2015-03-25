@@ -34,7 +34,7 @@ public class Document {
 		//weight title
 		String[] titleTokens = new Tokenizer().tokenize(jsoupDoc.title());
 		for(String token : titleTokens) {
-			addTermCount(token, 5);
+			addTermCount(token, 3);
 		}
 		
 		calculateMagnitude();
