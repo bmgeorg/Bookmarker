@@ -21,17 +21,20 @@ public class Document implements Serializable {
 		//lie and say we are Firefox -- prevents 403 errors, should probably fix eventually
 		org.jsoup.nodes.Document htmlDoc = Jsoup.connect(url).userAgent("Mozilla").get();
 		String[] tokens = new Tokenizer().tokenize(htmlDoc.text());
+		numTerms = tokens.length;
 
 		//count tokens and add to termCounts
 		termCounts = new HashMap<String, Integer>();
 		for(String token : tokens) {
-			int count = 1;
-			if(termCounts.containsKey(token)) {
-				count = termCounts.get(token) + 1;
-			}
-			termCounts.put(token, count);
+			addTermCount(token, 1);
 		}
-		numTerms = tokens.length;
+		
+		
+		//weight title
+		String[] titleTokens = new Tokenizer().tokenize(htmlDoc.title());
+		for(String token : titleTokens) {
+			addTermCount(token, 5);
+		}
 		
 		calculateMagnitude();
 	}
@@ -65,6 +68,13 @@ public class Document implements Serializable {
 			magnitude += Math.pow(weightForTerm(iter.next()), 2);
 		}
 		magnitude = Math.sqrt(magnitude);
+	}
+	
+	private void addTermCount(String term, int count) {
+		if(termCounts.containsKey(term)) {
+			count = termCounts.get(term) + count;
+		}
+		termCounts.put(term, count);
 	}
 	
 	/* testing */
