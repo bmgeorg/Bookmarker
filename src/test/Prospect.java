@@ -22,7 +22,7 @@ class Prospect {
 	public String toShortString() {
 		return	"Num correct: " + String.valueOf(numCorrect) + "\n" +
 				"Out of: " + String.valueOf(totalCount) + "\n" + 
-				"Accuracy: " + String.valueOf(accuracy) + "\n";
+				String.format("Accuracy: %.2f\n", accuracy);
 	}
 }
 
@@ -54,8 +54,8 @@ class CategoryProspect {
 			result += "[FP] " + s + "\n";
 		}
 
-		result += "Recall: " + String.valueOf(recall) + "\n";
-		result += "Confidence: " + String.valueOf(confidence) + "\n";
+		result += String.format("Recall: %.2f\n", recall);
+		result += String.format("Confidence: %.2f\n", confidence);
 		
 		return result;
 	}
