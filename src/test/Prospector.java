@@ -19,16 +19,26 @@ public class Prospector {
 	 * goldFile holds manually categorized urls
 	 * categoriesFile holds categories and tags (see format in DataLoader loadCategories())
 	 * urlFile holds urls (see format in DataLoader loadDocs())
+	 * if reorderURLs is true, the method will randomly reorder urls from urlFile before bookmarking the urls -
+	 * important because order generally matters when bookmarking
 	 * 
 	 * Uses Bookmarker object to categorize urls from urlFile into the categories in categoriesFile
 	 * Compares results from Bookmarker with gold data from goldFile
 	 * Returns summary of comparison in a Prospect object
 	 */
-	public Prospect prospect(String goldFile, String categoriesFile, String urlFile) {
+	public Prospect prospect(String goldFile, String categoriesFile, String urlFile, boolean reorderURLs) {		
+		//load gold
 		ArrayList<Category> gold = DataLoader.loadGold(goldFile, true);
 
+		//load ore
 		ArrayList<Category> categories = DataLoader.loadCategories(categoriesFile);
 		ArrayList<Document> docs = DataLoader.loadDocs(urlFile, true);
+		//reorder urls
+		if(reorderURLs) {
+			Collections.shuffle(docs);
+		}
+		
+		//bookmark ore
 		Bookmarker bookmarker = new Bookmarker();
 		bookmarker.addCategories(categories);
 		for(Document doc : docs) {
@@ -109,7 +119,7 @@ public class Prospector {
 	}
 
 	public static void main(String args[]) {
-		Prospect prospect = new Prospector().prospect("smallGold.txt", "smallCategories.txt", "smallURLs.txt");
+		Prospect prospect = new Prospector().prospect("smallGold.txt", "smallCategories.txt", "smallURLs.txt", false);
 		System.out.println(prospect);
 	}
 }

@@ -1,8 +1,5 @@
 package test;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 public class MultiProspector {
 	/*
@@ -12,23 +9,9 @@ public class MultiProspector {
 		assert numReorderings > 0;
 		
 		//get prospects 
-		String reorderedURLs = "tempURLFile";
 		Prospect prospects[] = new Prospect[numReorderings];
 		for(int i = 0; i < numReorderings; i++) {
-			try {
-				LineScrambler.reorderLines(DataLoader.dataDir + urlFile, DataLoader.dataDir + reorderedURLs);
-			} catch (IOException e) {
-				e.printStackTrace();
-				System.exit(1);
-			}
-			prospects[i] = new Prospector().prospect(goldFile, categoriesFile, reorderedURLs);
-		}
-		//delete temp file
-		try {
-		    Files.delete(Paths.get(DataLoader.dataDir + reorderedURLs));
-		} catch(IOException e) {
-			e.printStackTrace();
-			System.exit(1);
+			prospects[i] = new Prospector().prospect(goldFile, categoriesFile, urlFile, true);
 		}
 		
 		//calculate summary
@@ -49,6 +32,6 @@ public class MultiProspector {
 	}
 	
 	public static void main(String args[]) {
-		System.out.println(new MultiProspector().summarizeProspects("smallGold.txt", "smallCategories.txt", "smallURLs.txt", 100));
+		System.out.println(new MultiProspector().summarizeProspects("smallGold.txt", "smallCategories.txt", "smallURLs.txt", 500));
 	}
 }
