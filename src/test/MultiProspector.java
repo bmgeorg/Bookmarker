@@ -11,6 +11,7 @@ public class MultiProspector {
 		//get prospects 
 		Prospect prospects[] = new Prospect[numReorderings];
 		for(int i = 0; i < numReorderings; i++) {
+			System.out.println(i);
 			prospects[i] = new Prospector().prospect(goldFile, categoriesFile, urlFile, true, useCache);
 		}
 		
@@ -38,6 +39,6 @@ public class MultiProspector {
 	}
 	
 	public static void main(String args[]) {
-		System.out.println(new MultiProspector().summarizeProspects("gold.txt", "categories.txt", "urls.txt", 500, true));
+		System.out.println(new MultiProspector().summarizeProspects("gold.txt", "categories.txt", "urls.txt", 10, true));
 	}
 }
