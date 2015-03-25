@@ -106,7 +106,7 @@ public class Category implements Serializable {
 	/*
 	 * Running time: O(MAX_NUM_TAGS)
 	 */
-	public Double score(Document doc) {
+	public CategoryReport score(Document doc) {
 		/*
 		 * Let q be vector of category tag weights
 		 * Let p be vector of doc term weights with terms corresponding to the tags in category
@@ -118,6 +118,7 @@ public class Category implements Serializable {
 		 * 
 		 * score is in [0, 1]
 		 */
+		CategoryReport report = new CategoryReport();
 		Iterator<Tag> iter = tagIterator();
 		Double qdotp = 0.0, qSqrMagnitude = 0.0;
 		while(iter.hasNext()) {
@@ -129,8 +130,10 @@ public class Category implements Serializable {
 		}
 		Double qMagnitude = Math.sqrt(qSqrMagnitude);
 		if(Math.sqrt(qMagnitude) == 0)
-			return 0.0;
-		return qdotp/(qMagnitude*doc.getMagnitude());
+			report.score = 0;
+		else
+			report.score = qdotp/(qMagnitude*doc.getMagnitude());
+		return report;
 	}
 	
 	/* private methods */

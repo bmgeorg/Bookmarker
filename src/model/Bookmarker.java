@@ -6,20 +6,24 @@ import java.util.ArrayList;
 public class Bookmarker {
 	private ArrayList<Category> categories = new ArrayList<Category>();
 	
-	public Category bookmark(Document doc) {
+	public BookmarkReport bookmark(Document doc) {
+		BookmarkReport report = new BookmarkReport();
+		report.categoryReports = new CategoryReport[categories.size()];
+		
 		double bestScore = 0;
 		Category bestCategory = null;
 		for(int i = 0; i < categories.size(); i++) {
-			double score = categories.get(i).score(doc);
-			if(score > bestScore) {
+			report.categoryReports[i] = categories.get(i).score(doc);
+			if(report.categoryReports[i].score > bestScore) {
 				bestCategory = categories.get(i);
-				bestScore = score;
+				bestScore = report.categoryReports[i].score;
 			}
 		}
 		
 		if(bestCategory != null) {
 			bestCategory.addDocument(doc);
-			return bestCategory;
+			report.bestFit = bestCategory;
+			return report;
 		} else {
 			return null;
 		}
