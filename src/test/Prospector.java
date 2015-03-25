@@ -26,13 +26,13 @@ public class Prospector {
 	 * Compares results from Bookmarker with gold data from goldFile
 	 * Returns summary of comparison in a Prospect object
 	 */
-	public Prospect prospect(String goldFile, String categoriesFile, String urlFile, boolean reorderURLs) {		
+	public Prospect prospect(String goldFile, String categoriesFile, String urlFile, boolean reorderURLs, boolean useCache) {		
 		//load gold
-		ArrayList<Category> gold = DataLoader.loadGold(goldFile, true);
+		ArrayList<Category> gold = DataLoader.loadGold(goldFile, useCache);
 
 		//load ore
 		ArrayList<Category> categories = DataLoader.loadCategories(categoriesFile);
-		ArrayList<Document> docs = DataLoader.loadDocs(urlFile, true);
+		ArrayList<Document> docs = DataLoader.loadDocs(urlFile, useCache);
 		//reorder urls
 		if(reorderURLs) {
 			Collections.shuffle(docs);
@@ -119,7 +119,7 @@ public class Prospector {
 	}
 
 	public static void main(String args[]) {
-		Prospect prospect = new Prospector().prospect("smallGold.txt", "smallCategories.txt", "smallURLs.txt", false);
+		Prospect prospect = new Prospector().prospect("smallGold.txt", "smallCategories.txt", "smallURLs.txt", false, false);
 		System.out.println(prospect);
 	}
 }

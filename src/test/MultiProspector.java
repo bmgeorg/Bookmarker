@@ -11,7 +11,7 @@ public class MultiProspector {
 		//get prospects 
 		Prospect prospects[] = new Prospect[numReorderings];
 		for(int i = 0; i < numReorderings; i++) {
-			prospects[i] = new Prospector().prospect(goldFile, categoriesFile, urlFile, true);
+			prospects[i] = new Prospector().prospect(goldFile, categoriesFile, urlFile, true, true);
 		}
 		
 		//calculate summary
