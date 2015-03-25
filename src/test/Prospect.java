@@ -9,6 +9,7 @@ class Prospect {
 	int totalCount;
 	ArrayList<CategoryProspect> prospects;
 	
+	@Override
 	public String toString() {
 		String result = "";
 		for(CategoryProspect prospect : prospects) {
@@ -33,6 +34,7 @@ class CategoryProspect {
 	Set<String> fn;
 	Set<String> fp;
 	
+	@Override
 	public String toString() {
 		String result = "";
 		result += categoryName + "\n";
@@ -55,6 +57,21 @@ class CategoryProspect {
 		result += "Recall: " + String.valueOf(recall) + "\n";
 		result += "Confidence: " + String.valueOf(confidence) + "\n";
 		
+		return result;
+	}
+}
+
+class ProspectSummary {
+	double avgAccuracy;
+	double minAccuracy;
+	double maxAccuracy;
+	
+	@Override
+	public String toString() {
+		String result = "";
+		result += String.format("Average accuracy: %.3f\n", avgAccuracy);
+		result += String.format("Min accuracy: %.3f\n", minAccuracy);
+		result += String.format("Max accuracy: %.3f\n", maxAccuracy);
 		return result;
 	}
 }

@@ -28,7 +28,7 @@ public class Prospector {
 		ArrayList<Category> gold = DataLoader.loadGold(goldFile, true);
 
 		ArrayList<Category> categories = DataLoader.loadCategories(categoriesFile);
-		ArrayList<Document> docs = DataLoader.loadDocs("smallURLs.txt", true);
+		ArrayList<Document> docs = DataLoader.loadDocs(urlFile, true);
 		Bookmarker bookmarker = new Bookmarker();
 		bookmarker.addCategories(categories);
 		for(Document doc : docs) {

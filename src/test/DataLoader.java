@@ -19,11 +19,11 @@ import model.Tokenizer;
  * Loads category and bookmark data from a .txt file
  */
 public class DataLoader {
-	private static final String dir = "src/dataSet_1/";
+	public static final String dataDir = "src/dataSet_1/";
 	private static HashMap<String, Document> docs = null;
 
 	private static Object deserialize(String fileName) {
-		String path = dir + fileName;
+		String path = dataDir + fileName;
 		try(FileInputStream f_in = new FileInputStream(path);
 				ObjectInputStream obj_in = new ObjectInputStream(f_in)) {
 			return obj_in.readObject();
@@ -40,7 +40,7 @@ public class DataLoader {
 	}
 
 	private static void createCache(String fileName, Object obj) {
-		String path = dir + fileName;
+		String path = dataDir + fileName;
 		try(FileOutputStream f_out = new FileOutputStream(path);
 				ObjectOutputStream obj_out = new ObjectOutputStream (f_out)) {
 			obj_out.writeObject(obj);
@@ -118,7 +118,7 @@ public class DataLoader {
 	 * 
 	 * Params:
 	 * fileName:
-	 * 	the name of the data file stored at DataLoader.dir
+	 * 	the name of the data file stored at DataLoader.dataDir
 	 * 	Example: rawURLS.txt
 	 * useCachedDocs:
 	 * 	if true, the method will load documents from a "docs.obj" cache file, loading from Internet if document is unfound
@@ -132,7 +132,7 @@ public class DataLoader {
 	 * url4
 	 */
 	public static ArrayList<Document> loadDocs(String fileName, boolean useCachedDocs) {
-		String path = dir + fileName;
+		String path = dataDir + fileName;
 		ArrayList<Document> result = new ArrayList<Document>();
 		try(BufferedReader br = new BufferedReader(new FileReader(path))) {
 			String line = br.readLine();
@@ -157,7 +157,7 @@ public class DataLoader {
 	 * 
 	 * Params:
 	 * fileName:
-	 * 	the name of the data file stored at DataLoader.dir
+	 * 	the name of the data file stored at DataLoader.dataDir
 	 * 	Example: smallCategories.txt
 	 * 
 	 * File Format:
@@ -168,7 +168,7 @@ public class DataLoader {
 	 * tag4, tag5, tag6
 	 */
 	public static ArrayList<Category> loadCategories(String fileName) {
-		String path = dir + fileName;
+		String path = dataDir + fileName;
 		ArrayList<Category> categories = new ArrayList<Category>();
 		try(BufferedReader br = new BufferedReader(new FileReader(path))) {
 			Category category = readCategory(br);
@@ -191,7 +191,7 @@ public class DataLoader {
 	 * 
 	 * Params:
 	 * fileName:
-	 * 	the name of the data file stored at DataLoader.dir
+	 * 	the name of the data file stored at DataLoader.dataDir
 	 * 	Example: cleanData.txt
 	 * useCachedDocs:
 	 * 	if true, the method will look up all documents in a docs.obj cache file instead of loading docs from Internet.
@@ -211,7 +211,7 @@ public class DataLoader {
 	 */
 	public static ArrayList<Category> loadGold(String fileName, boolean useCachedDocs) {
 		ArrayList<Category> categories = new ArrayList<Category>();
-		String path = dir + fileName;
+		String path = dataDir + fileName;
 		try(BufferedReader br = new BufferedReader(new FileReader(path))) {
 			while(true) {
 				Category category = readCategory(br);
