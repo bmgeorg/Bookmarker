@@ -65,13 +65,15 @@ class ProspectSummary {
 	double avgAccuracy;
 	double minAccuracy;
 	double maxAccuracy;
+	double stdDeviation;
 	
 	@Override
 	public String toString() {
 		String result = "";
-		result += String.format("Average accuracy: %.3f\n", avgAccuracy);
-		result += String.format("Min accuracy: %.3f\n", minAccuracy);
-		result += String.format("Max accuracy: %.3f\n", maxAccuracy);
+		result += String.format("Average accuracy: %.2f\n", avgAccuracy);
+		result += String.format("Standard deviation: %.2f\n", stdDeviation);
+		result += String.format("Min accuracy: %.2f\n", minAccuracy);
+		result += String.format("Max accuracy: %.2f\n", maxAccuracy);
 		return result;
 	}
 }

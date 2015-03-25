@@ -27,6 +27,12 @@ public class MultiProspector {
 			summary.avgAccuracy += prospects[i].accuracy;
 		}
 		summary.avgAccuracy = summary.avgAccuracy/prospects.length;
+		summary.stdDeviation = 0;
+		for(int i = 0; i < prospects.length; i++) {
+			summary.stdDeviation += (summary.avgAccuracy - prospects[i].accuracy)*(summary.avgAccuracy - prospects[i].accuracy);
+		}
+		summary.stdDeviation /= prospects.length;
+		summary.stdDeviation = Math.sqrt(summary.stdDeviation);
 		
 		return summary;
 	}
