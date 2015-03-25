@@ -6,20 +6,6 @@ import java.util.ArrayList;
 public class Bookmarker {
 	private ArrayList<Category> categories = new ArrayList<Category>();
 	
-	public ArrayList<Category> getCategories() {
-		return categories;
-	}
-	
-	public void addCategories(ArrayList<Category> newCategories) {
-		for(Category category : newCategories) {
-			categories.add(category);
-		}
-	}
-	
-	public void addCategory(Category newCategory) {
-		categories.add(newCategory);
-	}
-	
 	public Category bookmark(Document doc) {
 		double bestScore = 0;
 		Category bestCategory = null;
@@ -39,6 +25,21 @@ public class Bookmarker {
 		}
 	}
 	
+	public void addCategories(ArrayList<Category> newCategories) {
+		for(Category category : newCategories) {
+			categories.add(category);
+		}
+	}
+	
+	public void addCategory(Category newCategory) {
+		categories.add(newCategory);
+	}
+	
+	public ArrayList<Category> getCategories() {
+		return categories;
+	}
+	
+	/* testing */
 	public void printCategories() {
 		System.out.println("Bookmarker Categories");
 		for(int i = 0; i < categories.size(); i++) {
