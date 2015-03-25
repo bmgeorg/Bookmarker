@@ -49,6 +49,6 @@ public class MultiProspector {
 	}
 	
 	public static void main(String args[]) {
-		System.out.println(new MultiProspector().summarizeProspects("smallGold.txt", "smallCategories.txt", "smallURLs.txt", 30));
+		System.out.println(new MultiProspector().summarizeProspects("smallGold.txt", "smallCategories.txt", "smallURLs.txt", 100));
 	}
 }

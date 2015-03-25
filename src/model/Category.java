@@ -11,7 +11,7 @@ import java.util.PriorityQueue;
 public class Category implements Serializable {
 	private static final long serialVersionUID = -456116242689353233L;
 	private String name;
-	private static final int MAX_NUM_TAGS = 25;
+	private static final int MAX_NUM_TAGS = 10;
 	/*
 	 * rawTagWeights: non-normalized tag weights
 	 * non-normalized tag weight = sum of tag weights from each document
