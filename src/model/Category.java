@@ -43,6 +43,7 @@ public class Category implements Serializable {
 		assert tags.length <= MAX_NUM_TAGS;
 		this.name = name;
 
+		//tokenize name and add as tags
 		String[] nameTokens = new Tokenizer().tokenize(name);
 		int numTags = Math.min(tags.length + nameTokens.length, MAX_NUM_TAGS);
 		String[] combinedTags = new String[numTags];
@@ -131,28 +132,8 @@ public class Category implements Serializable {
 			return 0.0;
 		return qdotp/(qMagnitude*doc.getMagnitude());
 	}
-
-	public void printDocumentURLs() {
-		for(int i = 0; i < docs.size(); i++) {
-			System.out.println(docs.get(i).getURL());
-		}
-	}
-
-	public void printRawTagWeights() {
-		ArrayList<Tag> tags = getSortedTags();
-		for(Tag tag : tags) {
-			System.out.println(tag.getTerm() + ": " + tag.getWeight());
-		}
-	}
 	
-	public void printAdjustedTagWeights() {
-		double mag = getMagnitude();
-		ArrayList<Tag> tags = getSortedTags();
-		for(Tag tag : tags) {
-			System.out.println(tag.getTerm() + ": " + tag.getWeight()/mag);
-		}
-	}
-	
+	/* private methods */
 	private ArrayList<Tag> getSortedTags() {
 		ArrayList<Tag> sortedTags = new ArrayList<Tag>();
 		Iterator<Tag> iter = tagIterator();
@@ -178,6 +159,28 @@ public class Category implements Serializable {
 		while(iter.hasNext())
 			sqrMagnitude += Math.pow(iter.next().getWeight(), 2.0);
 		return Math.sqrt(sqrMagnitude);
+	}
+	
+	/* testing */
+	public void printDocumentURLs() {
+		for(int i = 0; i < docs.size(); i++) {
+			System.out.println(docs.get(i).getURL());
+		}
+	}
+
+	public void printRawTagWeights() {
+		ArrayList<Tag> tags = getSortedTags();
+		for(Tag tag : tags) {
+			System.out.println(tag.getTerm() + ": " + tag.getWeight());
+		}
+	}
+	
+	public void printAdjustedTagWeights() {
+		double mag = getMagnitude();
+		ArrayList<Tag> tags = getSortedTags();
+		for(Tag tag : tags) {
+			System.out.println(tag.getTerm() + ": " + tag.getWeight()/mag);
+		}
 	}
 
 	public static void main(String args[]) throws IOException {
