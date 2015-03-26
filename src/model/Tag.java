@@ -22,13 +22,7 @@ public class Tag implements Serializable {
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((term == null) ? 0 : term.hashCode());
-		long temp;
-		temp = Double.doubleToLongBits(weight);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
-		return result;
+		return term.hashCode();
 	}
 
 	@Override
