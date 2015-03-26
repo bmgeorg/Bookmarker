@@ -5,8 +5,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.PriorityQueue;
+import java.util.Set;
 
 public class Category implements Serializable {
 	private static final long serialVersionUID = -456116242689353233L;
@@ -43,20 +45,28 @@ public class Category implements Serializable {
 		assert tags.length <= MAX_NUM_TAGS;
 		this.name = name;
 
-		//tokenize name and add as tags
-		String[] nameTokens = new Tokenizer().tokenize(name);
-		int numTags = Math.min(tags.length + nameTokens.length, MAX_NUM_TAGS);
-		String[] combinedTags = new String[numTags];
+		//collect unique tags
+		Set<String> uniqueTags = new HashSet<String>();
 		for(int i = 0; i < tags.length; i++)
-			combinedTags[i] = tags[i];
-		for(int i = 0; i + tags.length < numTags; i++)
-			combinedTags[i+tags.length] = nameTokens[i]; 
+			uniqueTags.add(tags[i]);
+		
+		//tokenize name and collect unique name tags
+		Set<String> uniqueNameTags = new HashSet<String>();
+		String[] nameTags = new Tokenizer().tokenize(name);
+		for(int i = 0; i < nameTags.length; i++)
+			if(!uniqueTags.contains(nameTags[i]))
+				uniqueNameTags.add(nameTags[i]);
 
-		//add tag raw weights
-		if(numTags > 0) {
-			double weight = 1.0/numTags;
-			for(String tag : combinedTags) {
-				rawTagWeights.add(new Tag(tag, weight));
+		//add tags
+		int numToAdd = Math.min(MAX_NUM_TAGS, uniqueTags.size() + uniqueNameTags.size());
+		if(numToAdd > 0) {
+			double weight = 1.0/numToAdd;
+			//the addTag function will automatically filter results if we add more than MAX_NUM_TAGS
+			for(String tag : uniqueTags) {
+				addTag(tag, weight);
+			}
+			for(String tag : uniqueNameTags) {
+				addTag(tag, weight);
 			}
 		}
 	}
@@ -72,13 +82,25 @@ public class Category implements Serializable {
 	public Iterator<Tag> tagIterator() {
 		return rawTagWeights.iterator();
 	}
+	
+	private void addTag(String term, double weight) {
+		//add term as tag iff numTags < MAX_NUM_TAGS or term weight is greater than current minimum tag weight
+		if(rawTagWeights.size() < MAX_NUM_TAGS || weight > rawTagWeights.peek().getWeight()) {
+			//remove min if already at tag cap
+			if(rawTagWeights.size() == MAX_NUM_TAGS)
+				rawTagWeights.remove();
+			//remove tag if it exists
+			rawTagWeights.remove(new Tag(term, 0.0));
+			rawTagWeights.add(new Tag(term, weight));
+		}
+	}
 
 	/*
 	 * T = num terms in doc
 	 * D = num documents
 	 * 
 	 * Best case running time; O(T*D)
-	 * Worst case running time: O(T*D + T*MAX_NUM_TAGS)
+	 * Worst case running time: O(T*D + T*MAX_NUM_TAGS*log(MAX_NUM_TAGS))
 	 */
 	public void addDocument(Document doc) {
 		//add each term in doc as tag if its cumulative weights is higher than lowest weight of current tag
@@ -89,15 +111,7 @@ public class Category implements Serializable {
 			//add weights from docs
 			for(int i = 0; i < docs.size(); i++)
 				weight += docs.get(i).weightForTerm(term);
-			//add term as tag iff numTags < MAX_NUM_TAGS or term weight is greater than current minimum tag weight
-			if(rawTagWeights.size() < MAX_NUM_TAGS || weight > rawTagWeights.peek().getWeight()) {
-				//remove min if already at tag cap
-				if(rawTagWeights.size() == MAX_NUM_TAGS)
-					rawTagWeights.remove();
-				//remove tag if it exists
-				rawTagWeights.remove(new Tag(term, 0.0));
-				rawTagWeights.add(new Tag(term, weight));
-			}
+			addTag(term, weight);
 		}
 
 		docs.add(doc);
