@@ -2,6 +2,7 @@ package model;
 
 import java.io.Serializable;
 
+//immutable
 public class Tag implements Serializable {
 	private static final long serialVersionUID = 8066132246215870812L;
 	private String term;

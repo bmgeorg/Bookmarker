@@ -11,18 +11,18 @@ public class Bookmarker {
 		report.categoryReports = new CategoryReport[categories.size()];
 		
 		double bestScore = 0;
-		Category bestCategory = null;
+		int bestCategoryIndex = -1;
 		for(int i = 0; i < categories.size(); i++) {
 			report.categoryReports[i] = categories.get(i).score(doc);
 			if(report.categoryReports[i].score > bestScore) {
-				bestCategory = categories.get(i);
+				bestCategoryIndex = i;
 				bestScore = report.categoryReports[i].score;
 			}
 		}
 		
-		if(bestCategory != null) {
-			bestCategory.addDocument(doc);
-			report.bestFit = bestCategory;
+		if(bestCategoryIndex != -1) {
+			categories.get(bestCategoryIndex).addDocument(doc);
+			report.chosenCategoryIndex = bestCategoryIndex;
 			return report;
 		} else {
 			return null;
