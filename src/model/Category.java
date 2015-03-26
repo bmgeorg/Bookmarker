@@ -5,23 +5,36 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
+
+import test.DataLoader;
 
 public class Category implements Serializable {
 	private static final long serialVersionUID = -456116242689353233L;
 	private String name;
-	private static final int MAX_NUM_TAGS = 10;
-	private static final double INITIAL_TAG_WEIGHT = 3;
+	private static final int MAX_USER_TAGS = 10;
+	private static final int MAX_DISCOVERED_TAGS = 10;
+	private static final double WEIGHT_FOR_USER_TAGS = 3; //will be scaled down by number of user tags
 	/*
-	 * rawTagWeights: non-normalized tag weights
-	 * non-normalized tag weight = sum of tag weights from each document
-	 * normalized tag weight = non-normalized tag weight / num documents
-	 * 
-	 * We allow up to MAX_NUM_TAGS in rawTagWeights. After that, we only let in a new tag if
-	 * it's raw weight is greater than the minimum raw weight in rawTagWeights.
+	 * All tags hold non-normalized tag weights. The non-normalized tag weight for a term is simply the sum of
+	 * weights for the term from all documents and user tags.
+	 */
+
+	/*
+	 * holds tags assigned by user to Category
+	 * maps terms to Tags
+	 * if number of user tags is less than MAX_USER_TAGS, the category name is tokenized and tokens are added
+	 * as userTags
+	 */
+	private Map<String, Tag> userTags = new HashMap<String, Tag>();
+
+	/* We allow up to MAX_DISCOVERED_TAGS in discoveredTags. After that, we only let in a new tag if
+	 * it's weight is greater than the minimum weight in discoveredTags.
 	 * We store rawTagWeights as a min priority queue so we know the minimum element in
 	 * constant time. 
 	 */
@@ -37,63 +50,49 @@ public class Category implements Serializable {
 				return 0;
 		}
 	}
-	private PriorityQueue<Tag> rawTagWeights =
-			new PriorityQueue<Tag>(MAX_NUM_TAGS, new TagComparator());
+	private PriorityQueue<Tag> discoveredTags=
+			new PriorityQueue<Tag>(MAX_DISCOVERED_TAGS, new TagComparator());
 	private ArrayList<Document> docs = new ArrayList<Document>();
 
 	public Category(String name, String... tags) {
 		assert name != null;
-		assert tags.length <= MAX_NUM_TAGS;
+		assert tags.length <= MAX_USER_TAGS;
 		this.name = name;
 
-		//collect unique tags
-		Set<String> uniqueTags = new HashSet<String>();
+		Set<String> tempTags = new HashSet<String>();
+		//add all tags
 		for(int i = 0; i < tags.length; i++)
-			uniqueTags.add(tags[i]);
-		
-		//tokenize name and collect unique name tags
-		Set<String> uniqueNameTags = new HashSet<String>();
+			tempTags.add(tags[i]);
+
+		//tokenize name and add tags as long as there is room
 		String[] nameTags = new Tokenizer().tokenize(name);
 		for(int i = 0; i < nameTags.length; i++)
-			if(!uniqueTags.contains(nameTags[i]))
-				uniqueNameTags.add(nameTags[i]);
+			if(tempTags.size() < MAX_USER_TAGS)
+				tempTags.add(nameTags[i]);
 
-		//add tags
-		int numToAdd = Math.min(MAX_NUM_TAGS, uniqueTags.size() + uniqueNameTags.size());
-		if(numToAdd > 0) {
-			double weight = INITIAL_TAG_WEIGHT/numToAdd;
-			//the addTag function will automatically filter results if we add more than MAX_NUM_TAGS
-			for(String tag : uniqueTags) {
-				addTag(tag, weight);
-			}
-			for(String tag : uniqueNameTags) {
-				addTag(tag, weight);
-			}
+		//add tags from tempTags
+		double weight = WEIGHT_FOR_USER_TAGS/tempTags.size();
+		Iterator<String> iter = tempTags.iterator();
+		while(iter.hasNext()) {
+			String term = iter.next();
+			userTags.put(term, new Tag(term, weight));
 		}
 	}
 
 	public String getName() {
 		return name;
 	}
-	
+
 	public ArrayList<Document> getDocs() {
 		return docs;
 	}
 
-	public Iterator<Tag> tagIterator() {
-		return rawTagWeights.iterator();
+	public Iterator<Tag> getUserTagIterator() {
+		return userTags.values().iterator();
 	}
-	
-	private void addTag(String term, double weight) {
-		//add term as tag iff numTags < MAX_NUM_TAGS or term weight is greater than current minimum tag weight
-		if(rawTagWeights.size() < MAX_NUM_TAGS || weight > rawTagWeights.peek().getWeight()) {
-			//remove min if already at tag cap
-			if(rawTagWeights.size() == MAX_NUM_TAGS)
-				rawTagWeights.remove();
-			//remove tag if it exists
-			rawTagWeights.remove(new Tag(term, 0.0));
-			rawTagWeights.add(new Tag(term, weight));
-		}
+
+	public Iterator<Tag> getDiscoveredTagIterator() {
+		return discoveredTags.iterator();
 	}
 
 	/*
@@ -101,25 +100,40 @@ public class Category implements Serializable {
 	 * D = num documents
 	 * 
 	 * Best case running time; O(T*D)
-	 * Worst case running time: O(T*D + T*MAX_NUM_TAGS*log(MAX_NUM_TAGS))
+	 * Worst case running time: O(T*D + T*MAX_DISCOVERED_TAGS*log(MAX_DISCOVERED_TAGS))
 	 */
 	public void addDocument(Document doc) {
-		//add each term in doc as tag if its cumulative weights is higher than lowest weight of current tag
 		Iterator<String> iter = doc.termIterator();
 		while(iter.hasNext()) {
 			String term = iter.next();
 			Double weight = doc.weightForTerm(term);
-			//add weights from docs
-			for(int i = 0; i < docs.size(); i++)
-				weight += docs.get(i).weightForTerm(term);
-			addTag(term, weight);
+
+			//if term is a user tag, update weight
+			if(userTags.containsKey(term)) {
+				double updatedWeight = userTags.get(term).getWeight() + weight;
+				userTags.put(term, new Tag(term, updatedWeight));
+			}
+			//add to discoveredTags iff its weight is higher than current lowest discovered tag weight 
+			else {
+				//add weights from docs
+				for(int i = 0; i < docs.size(); i++)
+					weight += docs.get(i).weightForTerm(term);
+				if(discoveredTags.size() < MAX_DISCOVERED_TAGS || weight > discoveredTags.peek().getWeight()) {
+					//remove min if already at tag cap
+					if(discoveredTags.size() == MAX_DISCOVERED_TAGS)
+						discoveredTags.remove();
+					//remove tag if it exists
+					discoveredTags.remove(new Tag(term, 0.0));
+					discoveredTags.add(new Tag(term, weight));
+				}
+			}
 		}
 
 		docs.add(doc);
 	}
 
 	/*
-	 * Running time: O(MAX_NUM_TAGS)
+	 * Running time: O(MAX_USER_TAGS + MAX_DISCOVERED_TAGS)
 	 */
 	public CategoryReport score(Document doc) {
 		/*
@@ -133,20 +147,40 @@ public class Category implements Serializable {
 		 * 
 		 * score is in [0, 1]
 		 */
-		Tag tags[] = new Tag[rawTagWeights.size()];
-		double docWeights[] = new double[rawTagWeights.size()];
 		
-		Iterator<Tag> iter = tagIterator();
+		//for returning in CategoryReport
+		Tag tags[] = new Tag[userTags.size() + discoveredTags.size()];
+		//for returning in CategoryReport
+		double docWeights[] = new double[userTags.size() + discoveredTags.size()];
+
 		double qdotp = 0.0, qSqrMagnitude = 0.0;
-		for(int i = 0; i < rawTagWeights.size(); i++) {
-			Tag tag = iter.next();
-			double categoryWeight = tag.getWeight();
-			double docWeight = doc.weightForTerm(tag.getTerm());
+		Iterator<Tag> iter = getUserTagIterator();
+		double categoryWeight;
+		double docWeight;
+		Tag tag;
+		//Score over user tags
+		for(int i = 0; i < userTags.size(); i++) {
+			tag = iter.next();
+			categoryWeight = tag.getWeight();
+			docWeight = doc.weightForTerm(tag.getTerm());
 			qdotp += categoryWeight*docWeight;
 			qSqrMagnitude += categoryWeight*categoryWeight;
 			tags[i] = tag;
 			docWeights[i] = docWeight;
 		}
+		//Score over discovered tags
+		iter = getDiscoveredTagIterator();
+		for(int i = userTags.size(); i - userTags.size() < discoveredTags.size(); i++) {
+			//same code as above, too cumbersome to refactor to a method
+			tag = iter.next();
+			categoryWeight = tag.getWeight();
+			docWeight = doc.weightForTerm(tag.getTerm());
+			qdotp += categoryWeight*docWeight;
+			qSqrMagnitude += categoryWeight*categoryWeight;
+			tags[i] = tag;
+			docWeights[i] = docWeight;
+		}
+
 		Double qMagnitude = Math.sqrt(qSqrMagnitude);
 		double score = 0;
 		if(qMagnitude != 0 && doc.getMagnitude() != 0)
@@ -154,11 +188,14 @@ public class Category implements Serializable {
 		CategoryReport report = new CategoryReport(name, score, tags, docWeights);
 		return report;
 	}
-	
+
 	/* private methods */
 	private ArrayList<Tag> getSortedTags() {
 		ArrayList<Tag> sortedTags = new ArrayList<Tag>();
-		Iterator<Tag> iter = tagIterator();
+		Iterator<Tag> iter = getUserTagIterator();
+		while(iter.hasNext())
+			sortedTags.add(iter.next());
+		iter = getDiscoveredTagIterator();
 		while(iter.hasNext())
 			sortedTags.add(iter.next());
 		Collections.sort(sortedTags, new Comparator<Tag>() {
@@ -173,16 +210,19 @@ public class Category implements Serializable {
 		});
 		return sortedTags;
 	}
-	
+
 	//expensive because the magnitude changes often and is not cached
 	private double getMagnitude() {
 		double sqrMagnitude = 0;
-		Iterator<Tag> iter = tagIterator();
+		Iterator<Tag> iter = getUserTagIterator();
+		while(iter.hasNext())
+			sqrMagnitude += Math.pow(iter.next().getWeight(), 2.0);
+		iter = getDiscoveredTagIterator();
 		while(iter.hasNext())
 			sqrMagnitude += Math.pow(iter.next().getWeight(), 2.0);
 		return Math.sqrt(sqrMagnitude);
 	}
-	
+
 	/* testing */
 	public void printDocumentURLs() {
 		for(int i = 0; i < docs.size(); i++) {
@@ -196,7 +236,7 @@ public class Category implements Serializable {
 			System.out.println(tag.getTerm() + ": " + tag.getWeight());
 		}
 	}
-	
+
 	public void printAdjustedTagWeights() {
 		double mag = getMagnitude();
 		ArrayList<Tag> tags = getSortedTags();
@@ -207,11 +247,10 @@ public class Category implements Serializable {
 
 	public static void main(String args[]) throws IOException {
 		Category design = new Category("Design");
-		Document doc1 = new Document("http://martinfowler.com/articles/designDead.html");
-		Document doc2 = new Document("http://martinfowler.com/articles/mocksArentStubs.html");
+		Document doc1 = DataLoader.getDoc("http://martinfowler.com/articles/designDead.html", true);
+		Document doc2 = DataLoader.getDoc("http://martinfowler.com/articles/mocksArentStubs.html", true);
 		
-		doc1.printTermWeights();
-		doc2.printTermWeights();
+		design.printRawTagWeights();
 
 		design.addDocument(doc2);
 		System.out.println();
