@@ -118,10 +118,8 @@ public class Category implements Serializable {
 		 * 
 		 * score is in [0, 1]
 		 */
-		CategoryReport report = new CategoryReport();
-		report.name = name;
-		report.tags = new Tag[rawTagWeights.size()];
-		report.docWeights = new double[rawTagWeights.size()];
+		Tag tags[] = new Tag[rawTagWeights.size()];
+		double docWeights[] = new double[rawTagWeights.size()];
 		
 		Iterator<Tag> iter = tagIterator();
 		double qdotp = 0.0, qSqrMagnitude = 0.0;
@@ -131,14 +129,14 @@ public class Category implements Serializable {
 			double docWeight = doc.weightForTerm(tag.getTerm());
 			qdotp += categoryWeight*docWeight;
 			qSqrMagnitude += categoryWeight*categoryWeight;
-			report.tags[i] = tag;
-			report.docWeights[i] = docWeight;
+			tags[i] = tag;
+			docWeights[i] = docWeight;
 		}
 		Double qMagnitude = Math.sqrt(qSqrMagnitude);
-		if(Math.sqrt(qMagnitude) == 0)
-			report.score = 0;
-		else
-			report.score = qdotp/(qMagnitude*doc.getMagnitude());
+		double score = 0;
+		if(qMagnitude != 0 && doc.getMagnitude() != 0)
+			score = qdotp/(qMagnitude*doc.getMagnitude());
+		CategoryReport report = new CategoryReport(name, score, tags, docWeights);
 		return report;
 	}
 	

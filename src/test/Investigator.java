@@ -19,7 +19,8 @@ public class Investigator {
 		//bookmark ore
 		Bookmarker bookmarker = new Bookmarker();
 		bookmarker.addCategories(categories);
-		for(Document doc : docs) {
+		for(int i = 0; i < docs.size(); i++) {
+			Document doc = docs.get(i);
 			System.out.println(doc.getBaseURI());
 			if(doc.getBaseURI().equals(url))
 				return bookmarker.bookmark(doc);
@@ -31,7 +32,7 @@ public class Investigator {
 	}
 	
 	public static void main(String args[]) {
-		BookmarkReport report = new Investigator().investigate("https://blog.nelhage.com/2010/08/write-yourself-an-strace-in-70-lines-of-code/", "categories.txt", "urls.txt", true);
+		BookmarkReport report = new Investigator().investigate("http://www.ranks.nl/stopwords", "categories.txt", "urls.txt", true);
 		System.out.println(report.toString());
 	}
 }
