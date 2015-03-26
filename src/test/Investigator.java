@@ -21,11 +21,14 @@ public class Investigator {
 		bookmarker.addCategories(categories);
 		for(int i = 0; i < docs.size(); i++) {
 			Document doc = docs.get(i);
-			System.out.println(doc.getBaseURI());
-			if(doc.getBaseURI().equals(url))
-				return bookmarker.bookmark(doc);
-			else
-				bookmarker.bookmark(doc);
+			BookmarkReport report = bookmarker.bookmark(doc);
+			System.out.print(doc.getBaseURI());
+			if(!doc.getBaseURI().equals(url)) {
+				System.out.println(" - " + report.categoryReports[0].name);
+			} else {
+				System.out.println();
+				return report;
+			}
 		}
 		
 		return null;

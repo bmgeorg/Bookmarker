@@ -1,10 +1,10 @@
 package model;
 
 public class CategoryReport {
-	String name;
-	double score;
-	Tag tags[];
-	double docWeights[];
+	public String name;
+	public double score;
+	public Tag tags[];
+	public double docWeights[];
 	
 	public CategoryReport(String name, double score, Tag tags[], double docWeights[]) {
 		this.name = name;

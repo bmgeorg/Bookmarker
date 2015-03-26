@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 public class BookmarkReport {
-	CategoryReport[] categoryReports;
+	public CategoryReport[] categoryReports;
 	public BookmarkReport(CategoryReport[] reports) {
 		categoryReports = reports;
 		
