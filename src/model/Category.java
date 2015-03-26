@@ -14,6 +14,7 @@ public class Category implements Serializable {
 	private static final long serialVersionUID = -456116242689353233L;
 	private String name;
 	private static final int MAX_NUM_TAGS = 10;
+	private static final double INITIAL_TAG_WEIGHT = 3;
 	/*
 	 * rawTagWeights: non-normalized tag weights
 	 * non-normalized tag weight = sum of tag weights from each document
@@ -60,7 +61,7 @@ public class Category implements Serializable {
 		//add tags
 		int numToAdd = Math.min(MAX_NUM_TAGS, uniqueTags.size() + uniqueNameTags.size());
 		if(numToAdd > 0) {
-			double weight = 1.0/numToAdd;
+			double weight = INITIAL_TAG_WEIGHT/numToAdd;
 			//the addTag function will automatically filter results if we add more than MAX_NUM_TAGS
 			for(String tag : uniqueTags) {
 				addTag(tag, weight);
