@@ -13,9 +13,6 @@ act
 actually
 added
 adj
-affected
-affecting
-affects
 after
 afterwards
 again
@@ -126,8 +123,6 @@ during
 e
 each
 ed
-edu
-effect
 eg
 eight
 eighty
@@ -234,7 +229,6 @@ index
 information
 instead
 into
-invention
 inward
 is
 isn't
@@ -247,7 +241,8 @@ i've
 j
 just
 k
-keep 	keeps
+keep
+keeps
 kept
 kg
 km
@@ -269,7 +264,6 @@ lets
 like
 liked
 likely
-line
 little
 'll
 look
@@ -308,7 +302,6 @@ my
 myself
 n
 na
-name
 namely
 nay
 nd
@@ -373,8 +366,6 @@ overall
 owing
 own
 p
-page
-pages
 part
 particular
 particularly
