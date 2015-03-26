@@ -1,19 +1,32 @@
 package model;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 public class BookmarkReport {
-	int chosenCategoryIndex;
 	CategoryReport[] categoryReports;
+	public BookmarkReport(CategoryReport[] reports) {
+		categoryReports = reports;
+		
+		//sort reports in descending order
+		Arrays.sort(categoryReports, new Comparator<CategoryReport>() {
+			@Override
+			public int compare(CategoryReport o1, CategoryReport o2) {
+				if(o1.score < o2.score)
+					return 1;
+				else if(o1.score > o2.score)
+					return -1;
+				else
+					return 0;
+			}
+		});
+	}
 	
 	@Override
 	public String toString() {
 		String result = "";
-		result += "Chosen Category\n\n";
-		result += categoryReports[chosenCategoryIndex].toString() + "\n";
-		result += "Other Categories\n\n";
 		for(int i = 0; i < categoryReports.length; i++) {
-			if(i != chosenCategoryIndex) {
 				result += categoryReports[i].toString() + "\n";
-			}
 		}
 		
 		return result;
