@@ -32,10 +32,10 @@ public class Document {
 		}
 		
 		//weight title
-		/*String[] titleTokens = new Tokenizer().tokenize(jsoupDoc.title());
+		String[] titleTokens = new Tokenizer().tokenize(jsoupDoc.title());
 		for(String token : titleTokens) {
 			addTermCount(token, 3);
-		}*/
+		}
 		
 		//add n-grams with n = 2
 		for(int i = 0; i < tokens.length-1; i++) {
