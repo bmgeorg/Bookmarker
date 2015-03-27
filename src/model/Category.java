@@ -20,6 +20,7 @@ public class Category implements Serializable {
 	private static final int MAX_USER_TAGS = 10;
 	private static final int MAX_DISCOVERED_TAGS = 10;
 	private static final double WEIGHT_FOR_USER_TAGS = 3; //will be scaled down by number of user tags
+	private static final double WEIGHT_PER_MATCHED_DOMAIN = 0.01; //not scaled down
 	/*
 	 * All tags hold non-normalized tag weights. The non-normalized tag weight for a term is simply the sum of
 	 * weights for the term from all documents and user tags.
@@ -33,7 +34,8 @@ public class Category implements Serializable {
 	 */
 	private Map<String, Tag> userTags = new HashMap<String, Tag>();
 
-	/* We allow up to MAX_DISCOVERED_TAGS in discoveredTags. After that, we only let in a new tag if
+	/* 
+	 * We allow up to MAX_DISCOVERED_TAGS in discoveredTags. After that, we only let in a new tag if
 	 * it's weight is greater than the minimum weight in discoveredTags.
 	 * We store rawTagWeights as a min priority queue so we know the minimum element in
 	 * constant time. 
@@ -52,6 +54,11 @@ public class Category implements Serializable {
 	}
 	private PriorityQueue<Tag> discoveredTags=
 			new PriorityQueue<Tag>(MAX_DISCOVERED_TAGS, new TagComparator());
+	/*
+	 * For weighting by domain
+	 * maps domain name to number of times domain occurs in Category
+	 */
+	private Map<String, Integer> domains = new HashMap<String, Integer>();
 	private ArrayList<Document> docs = new ArrayList<Document>();
 
 	public Category(String name, String... tags) {
@@ -103,6 +110,10 @@ public class Category implements Serializable {
 	 * Worst case running time: O(T*D + T*MAX_DISCOVERED_TAGS*log(MAX_DISCOVERED_TAGS))
 	 */
 	public void addDocument(Document doc) {
+		if(doc.getDomain() != null) {
+			addDomain(doc.getDomain());
+		}
+
 		Iterator<String> iter = doc.termIterator();
 		while(iter.hasNext()) {
 			String term = iter.next();
@@ -138,26 +149,35 @@ public class Category implements Serializable {
 	public CategoryReport score(Document doc) {
 		/*
 		 * Let q be vector of category tag weights
-		 * Let p be vector of doc term weights with terms corresponding to the tags in category
+		 * Let p be vector of doc term weights corresponding to tags
 		 * Let w be vector of all doc term weights
 		 * Let |q| be the magnitude of vector q
 		 * Let |p| be the magnitude of vector p
 		 * 
-		 * score = q (dot product) p / (|q| * |p|)
+		 * score = q (dot product) p / (|q| * |w|)
 		 * 
 		 * score is in [0, 1]
 		 */
-		
+
 		//for returning in CategoryReport
 		Tag tags[] = new Tag[userTags.size() + discoveredTags.size()];
 		//for returning in CategoryReport
 		double docWeights[] = new double[userTags.size() + discoveredTags.size()];
 
-		double qdotp = 0.0, qSqrMagnitude = 0.0;
+		double qdotp = 0.0, qSqrMagnitude = 0.0, pSqrMagnitude = doc.getMagnitude()*doc.getMagnitude();
 		Iterator<Tag> iter = getUserTagIterator();
 		double categoryWeight;
 		double docWeight;
 		Tag tag;
+		//Score domain name matches
+		String domain = doc.getDomain();
+		if(domain != null && domains.containsKey(domain)) {
+			double addedWeight = WEIGHT_PER_MATCHED_DOMAIN*domains.get(domain);
+			pSqrMagnitude += addedWeight;
+			qSqrMagnitude += addedWeight;
+			qdotp += addedWeight*addedWeight;
+		}
+
 		//Score over user tags
 		for(int i = 0; i < userTags.size(); i++) {
 			tag = iter.next();
@@ -171,7 +191,7 @@ public class Category implements Serializable {
 		//Score over discovered tags
 		iter = getDiscoveredTagIterator();
 		for(int i = userTags.size(); i - userTags.size() < discoveredTags.size(); i++) {
-			//same code as above, too cumbersome to refactor to a method
+			//same code as above for user tags, too cumbersome to refactor to a method
 			tag = iter.next();
 			categoryWeight = tag.getWeight();
 			docWeight = doc.weightForTerm(tag.getTerm());
@@ -181,10 +201,11 @@ public class Category implements Serializable {
 			docWeights[i] = docWeight;
 		}
 
-		Double qMagnitude = Math.sqrt(qSqrMagnitude);
+		double qMagnitude = Math.sqrt(qSqrMagnitude);
+		double pMagnitude = Math.sqrt(pSqrMagnitude);
 		double score = 0;
 		if(qMagnitude != 0 && doc.getMagnitude() != 0)
-			score = qdotp/(qMagnitude*doc.getMagnitude());
+			score = qdotp/(qMagnitude*pMagnitude);
 		CategoryReport report = new CategoryReport(name, score, tags, docWeights);
 		return report;
 	}
@@ -222,6 +243,13 @@ public class Category implements Serializable {
 			sqrMagnitude += Math.pow(iter.next().getWeight(), 2.0);
 		return Math.sqrt(sqrMagnitude);
 	}
+	private void addDomain(String domain) {
+		int count = 1;
+		if(domains.containsKey(domain)) {
+			count += domains.get(domain);
+		}
+		domains.put(domain, count);
+	}
 
 	/* testing */
 	public void printDocumentURLs() {
@@ -249,7 +277,7 @@ public class Category implements Serializable {
 		Category design = new Category("Design");
 		Document doc1 = DataLoader.getDoc("http://martinfowler.com/articles/designDead.html", true);
 		Document doc2 = DataLoader.getDoc("http://martinfowler.com/articles/mocksArentStubs.html", true);
-		
+
 		design.printRawTagWeights();
 
 		design.addDocument(doc2);

@@ -1,6 +1,8 @@
 package model;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -8,7 +10,8 @@ import org.jsoup.Jsoup;
 
 public class Document {
 	//the actual base uri of a page (after redirection) retrieved from jsoup doc
-	private String baseURI;
+	private String baseURI; //example: http://www.stackoverflow.com/questions/how-do-you-do-this.html
+	private String domain; //example: stackoverflow.com
 	private HashMap<String, Integer> termCounts;
 	//numTerms = count of all terms in document, not just count of distinct terms in document
 	private int numTerms;
@@ -20,6 +23,7 @@ public class Document {
 	
 	private void setup(org.jsoup.nodes.Document jsoupDoc) {
 		this.baseURI = jsoupDoc.baseUri();
+		this.domain = getDomain(this.baseURI);
 		this.jsoupDoc = jsoupDoc;
 
 		String[] tokens = new Tokenizer().tokenize(jsoupDoc.text());
@@ -54,21 +58,20 @@ public class Document {
 		org.jsoup.nodes.Document jsoupDoc = Jsoup.connect(url).userAgent("Mozilla").get();
 		setup(jsoupDoc);
 	}
-	
 	//load document from memento
 	public Document(DocumentMemento memento) {
 		org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(memento.html, memento.baseURI);
 		setup(jsoupDoc);
 	}
-	
 	public String getBaseURI() {
 		return baseURI;
 	}
-	
+	public String getDomain() {
+		return domain;
+	}
 	public DocumentMemento getMemento() {
 		return new DocumentMemento(jsoupDoc.html(), baseURI);
 	}
-	
 	public Iterator<String> termIterator() {
 		return termCounts.keySet().iterator();
 	}
@@ -101,6 +104,16 @@ public class Document {
 			count = termCounts.get(term) + count;
 		}
 		termCounts.put(term, count);
+	}
+	private String getDomain(String url) {
+	    URI uri = null;
+		try {
+			uri = new URI(url);
+		} catch (URISyntaxException e) {
+			return null;
+		}
+	    String theDomain = uri.getHost();
+	    return theDomain.startsWith("www.") ? theDomain.substring(4) : theDomain;
 	}
 	
 	/* testing */

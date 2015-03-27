@@ -45,3 +45,17 @@ Min: 0.84
 Max: 0.95
 Notes:
 Marginal improvement! I knew title weighting was a good idea.
+
+1.5 - domain matching
+Params:
+MAX_USER_TAGS = 10, MAX_DISCOVERED_TAGS = 10, Title weight = 3, 2-gram weight = 2, WEIGHT_FOR_USER_TAGS = 3/numUserTags,
+WEIGHT_PER_MATCHED_DOMAIN = 0.01
+
+Average: 0.88
+Standard dev: 0.02
+Min: 0.83
+Max: 0.95
+Notes:
+For this data set, the major recurring domain was stackoverflow.com, an aggregate site. As such, stackoverflow docs belong
+to different categories; thus domain matching did not help. For other data, I expect to domain matching to be a significant
+boost to performance, probably prompting an increased WEIGHT_PER_MATCHED_DOMAIN.
