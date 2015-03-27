@@ -37,7 +37,7 @@ Max: 0.94
 Notes:
 Fuck yeah.
 
-1.3 - added back title weighting
+1.4 - added back title weighting
 Params: MAX_USER_TAGS = 10, MAX_DISCOVERED_TAGS = 10, Title weight = 3, 2-gram weight = 2, WEIGHT_FOR_USER_TAGS = 3/numUserTags
 Average: 0.88
 Standard dev: 0.02
