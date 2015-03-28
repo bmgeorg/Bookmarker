@@ -12,12 +12,14 @@ public class Document {
 	//the actual base uri of a page (after redirection) retrieved from jsoup doc
 	private String baseURI; //example: http://www.stackoverflow.com/questions/how-do-you-do-this.html
 	private String domain; //example: stackoverflow.com
-	private static final int TWO_GRAM_WEIGHT = 2;
-	private static final int TITLE_WEIGHT = 3;
-	private static final int TWO_GRAM_TITLE_WEIGHT = 2;
-	//numTerms = the sum of all term counts in termCounts
-	private int termSum;
-	private HashMap<String, Integer> termCounts;
+	private static final double DEFAULT_WEIGHT = 1;
+	private static final double TWO_GRAM_WEIGHT = 2;
+	private static final double TITLE_WEIGHT = 3;
+	private static final double TWO_GRAM_TITLE_WEIGHT = 2;
+	//totalWeight = the sum of weights for all terms in rawTermWeights
+	private double totalWeight;
+	//the non-normalized weight for a term; will be normalized by 1/totalWeight
+	private HashMap<String, Double> rawTermWeights;
 	//magnitude: the magnitude of the term weight vector in the vector space model
 	private double magnitude;
 	//the jsoup representation of the Document
@@ -28,36 +30,36 @@ public class Document {
 		this.baseURI = jsoupDoc.baseUri();
 		this.domain = getDomain(this.baseURI);
 		this.jsoupDoc = jsoupDoc;
-		termSum = 0;
+		totalWeight = 0;
 
 		//index body
-		String[] tokens = new Tokenizer().tokenize(jsoupDoc.text());
-		termSum += tokens.length;
-		termCounts = new HashMap<String, Integer>();
-		for(String token : tokens) {
-			addTermCount(token, 1);
+		String[] bodyTokens = new Tokenizer().tokenize(jsoupDoc.text());
+		totalWeight += bodyTokens.length*DEFAULT_WEIGHT;
+		rawTermWeights = new HashMap<String, Double>();
+		for(String token : bodyTokens) {
+			addTermWeight(token, DEFAULT_WEIGHT);
 		}
 		//add n-grams with n = 2
-		if(tokens.length > 2) {
-			termSum += tokens.length-1;
-			for(int i = 0; i < tokens.length-1; i++) {
-				String ngram = tokens[i] + " " + tokens[i+1];
-				addTermCount(ngram, TWO_GRAM_WEIGHT);
+		if(bodyTokens.length > 2) {
+			totalWeight += (bodyTokens.length-1)*TWO_GRAM_WEIGHT;
+			for(int i = 0; i < bodyTokens.length-1; i++) {
+				String ngram = bodyTokens[i] + " " + bodyTokens[i+1];
+				addTermWeight(ngram, TWO_GRAM_WEIGHT);
 			}
 		}
 
 		//index title
 		String[] titleTokens = new Tokenizer().tokenize(jsoupDoc.title());
-		termSum += titleTokens.length;
+		totalWeight += titleTokens.length*TITLE_WEIGHT;
 		for(String token : titleTokens) {
-			addTermCount(token, TITLE_WEIGHT);
+			addTermWeight(token, TITLE_WEIGHT);
 		}
 		//add n-grams with n = 2
 		if(titleTokens.length > 2) {
-			termSum += titleTokens.length-1;
+			totalWeight += (titleTokens.length-1)*TWO_GRAM_TITLE_WEIGHT;
 			for(int i = 0; i < titleTokens.length-1; i++) {
 				String ngram = titleTokens[i] + " " + titleTokens[i+1];
-				addTermCount(ngram, TWO_GRAM_TITLE_WEIGHT);
+				addTermWeight(ngram, TWO_GRAM_TITLE_WEIGHT);
 			}
 		}
 
@@ -87,14 +89,14 @@ public class Document {
 		return new DocumentMemento(jsoupDoc.html(), baseURI);
 	}
 	public Iterator<String> termIterator() {
-		return termCounts.keySet().iterator();
+		return rawTermWeights.keySet().iterator();
 	}
 
-	//weight is relative frequency of term among all terms
+	//weight is proportion of term's weight in totalWeight
 	//weight is in [0, 1]
 	public double weightForTerm(String term) {
-		if(termCounts.containsKey(term))
-			return (double)termCounts.get(term)/termSum;
+		if(rawTermWeights.containsKey(term))
+			return rawTermWeights.get(term)/totalWeight;
 		else
 			return 0.0;
 	}
@@ -113,11 +115,11 @@ public class Document {
 		magnitude = Math.sqrt(magnitude);
 	}
 
-	private void addTermCount(String term, int count) {
-		if(termCounts.containsKey(term)) {
-			count = termCounts.get(term) + count;
+	private void addTermWeight(String term, double weight) {
+		if(rawTermWeights.containsKey(term)) {
+			weight += rawTermWeights.get(term);
 		}
-		termCounts.put(term, count);
+		rawTermWeights.put(term, weight);
 	}
 	private String getDomain(String url) {
 		URI uri = null;
@@ -131,15 +133,6 @@ public class Document {
 	}
 
 	/* testing */
-	public void printTermCounts() {
-		Iterator<String> iter = termIterator();
-		while(iter.hasNext()) {
-			String term = iter.next();
-			System.out.print(term);
-			System.out.println(" " + termCounts.get(term));
-		}
-	}
-
 	public void printTermWeights() {
 		Iterator<String> iter = termIterator();
 		while(iter.hasNext()) {
