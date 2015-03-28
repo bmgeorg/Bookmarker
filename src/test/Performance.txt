@@ -59,3 +59,12 @@ Notes:
 For this data set, the major recurring domain was stackoverflow.com, an aggregate site. As such, stackoverflow docs belong
 to different categories; thus domain matching did not help. For other data, I expect to domain matching to be a significant
 boost to performance, probably prompting an increased WEIGHT_PER_MATCHED_DOMAIN.
+
+1.5 - fixed bug in document term weighting that didn't count terms in title correctly
+MAX_USER_TAGS = 10, MAX_DISCOVERED_TAGS = 10, Title weight = 3, 2-gram weight = 2, WEIGHT_FOR_USER_TAGS = 3/numUserTags,
+WEIGHT_PER_MATCHED_DOMAIN = 0.01
+
+Average accuracy: 0.87
+Standard deviation: 0.01
+Min accuracy: 0.84
+Max accuracy: 0.90
