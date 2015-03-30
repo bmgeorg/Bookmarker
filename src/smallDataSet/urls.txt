@@ -51,7 +51,6 @@ http://stackoverflow.com/questions/927358/how-to-undo-the-last-commit
 http://www.amazon.com/Radical-Pro-Indoor-Racquetball-Shoes/dp/B004U8CYRU
 https://developer.apple.com/library/iOS/referencelibrary/GettingStarted/RoadMapiOS/FirstTutorial.html#//apple_ref/doc/uid/TP40011343-CH3-SW1
 http://www.gnu.org/software/libc/manual/html_node/Program-Arguments.html#Program-Arguments
-https://docs.google.com/a/g.clemson.edu/spreadsheet/ccc?key=0ApYH88Ln38bvdElkcV9rZm5aa2Fhei14ZmFNOVI3UkE&usp=sharing#gid=0
 http://stackoverflow.com/questions/75191/what-is-an-unsigned-char
 http://realm.io/docs/cocoa/0.89.0/
 http://stackoverflow.com/questions/9150370/select-the-top-n-rows-from-a-table

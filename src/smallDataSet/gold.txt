@@ -65,6 +65,10 @@ http://www.cprogramming.com/tips/
 http://www.cplusplus.com/articles/NhA0RXSz/
 http://www.cplusplus.com/doc/tutorial/arrays/
 http://stackoverflow.com/questions/75191/what-is-an-unsigned-char
+http://gribblelab.org/CBootcamp/12_Compiling_linking_Makefile_header_files.html
+http://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/
+https://blog.nelhage.com/2010/08/write-yourself-an-strace-in-70-lines-of-code/
+https://github.com/nelhage/ministrace/blob/for-blog/ministrace.c
 
 Java
 java, object-oriented, class
@@ -95,7 +99,6 @@ http://www.ranks.nl/stopwords
 
 Racquetball
 racquetball, court
-https://docs.google.com/a/g.clemson.edu/spreadsheet/ccc?key=0ApYH88Ln38bvdElkcV9rZm5aa2Fhei14ZmFNOVI3UkE&usp=sharing#gid=0
 http://www.amazon.com/Radical-Pro-Indoor-Racquetball-Shoes/dp/B004U8CYRU
 http://www.racquetballwarehouse.com/descpage.html?PCODE=HDGRIDB
 http://www.racquetballwarehouse.com/descpage.html?PCODE=HRPRO2
