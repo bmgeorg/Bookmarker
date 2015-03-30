@@ -16,7 +16,9 @@ public class Document {
 	private static final double TEXT_WEIGHT= 1;
 	private static final double TITLE_WEIGHT = 3;
 	private static final double META_DESCRIPTION_WEIGHT = 1;
-	private static final double TWO_GRAM_WEIGHT_MULTIPLIER = 2; //the weight of a 2-gram is [WEIGHT]*TWO_GRAM_WEIGHT_MULTIPLIER
+	private static final double IMAGE_ALT_WEIGHT = 0.5;
+	//the weight of a 2-gram is [WEIGHT]*TWO_GRAM_WEIGHT_MULTIPLIER
+	private static final double TWO_GRAM_WEIGHT_MULTIPLIER = 2; 
 	//totalWeight = the sum of weights for all terms in rawTermWeights
 	private double totalWeight;
 	//the non-normalized weight for a term; will be normalized by 1/totalWeight
@@ -37,12 +39,18 @@ public class Document {
 		index(jsoupDoc.text(), TEXT_WEIGHT);
 		index(jsoupDoc.title(), TITLE_WEIGHT);
 		//index meta description
-		Elements descriptionMetaTags = jsoupDoc.select("meta[name=description]");
-		if(descriptionMetaTags.size() > 0) {
-			String metaDescription = descriptionMetaTags.first().attr("content");
-			index(metaDescription, META_DESCRIPTION_WEIGHT);
+		Elements descriptionTags = jsoupDoc.select("meta[name=description]");
+		for(int i = 0; i < descriptionTags.size(); i++) {
+			String description = descriptionTags.get(i).attr("content");
+			index(description, META_DESCRIPTION_WEIGHT);
 		}
-
+		//index alt tags
+		Elements images = jsoupDoc.getElementsByTag("img");
+		for(int i = 0; i < images.size(); i++) {
+			String alt = images.get(i).attr("alt");
+			index(alt, IMAGE_ALT_WEIGHT);
+		}
+		
 		calculateMagnitude();
 	}
 
