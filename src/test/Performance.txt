@@ -61,6 +61,7 @@ to different categories; thus domain matching did not help. For other data, I ex
 boost to performance, probably prompting an increased WEIGHT_PER_MATCHED_DOMAIN.
 
 1.5 - fixed bug in document term weighting that didn't count terms in title correctly
+Params:
 MAX_USER_TAGS = 10, MAX_DISCOVERED_TAGS = 10, Title weight = 3, 2-gram weight = 2, WEIGHT_FOR_USER_TAGS = 3/numUserTags,
 WEIGHT_PER_MATCHED_DOMAIN = 0.01
 
@@ -68,3 +69,29 @@ Average accuracy: 0.87
 Standard deviation: 0.01
 Min accuracy: 0.84
 Max accuracy: 0.90
+
+1.7 - Weight for meta description, Alt attributes, h1 tags, and domain tokens
+Params:
+Category: MAX_USER_TAGS = 10, MAX_DISCOVERED_TAGS = 10, WEIGHT_FOR_USER_TAGS = 3, WEIGHT_FOR_USER_TAGS = 3/numUserTags, WEIGHT_PER_MATCHED_DOMAIN = 0.01
+Document: TEXT_WEIGHT = 1, TITLE_WEIGHT = 3, META_DESCRIPTION_WEIGHT = 1, IMAGE_ALT_WEIGHT = 0.5, H1_EXTRA_WEIGHT = 1, DOMAIN_TOKEN_WEIGHT = 1
+TWO_GRAM_WEIGHT_MULTIPLIER = 2
+
+Average accuracy: 0.87
+Standard deviation: 0.01
+Min accuracy: 0.83
+Max accuracy: 0.90
+
+1.8 - Stemming
+Params:
+Category: MAX_USER_TAGS = 10, MAX_DISCOVERED_TAGS = 10, WEIGHT_FOR_USER_TAGS = 3, WEIGHT_FOR_USER_TAGS = 3/numUserTags, WEIGHT_PER_MATCHED_DOMAIN = 0.01
+Document: TEXT_WEIGHT = 1, TITLE_WEIGHT = 3, META_DESCRIPTION_WEIGHT = 1, IMAGE_ALT_WEIGHT = 0.5, H1_EXTRA_WEIGHT = 1, DOMAIN_TOKEN_WEIGHT = 1
+TWO_GRAM_WEIGHT_MULTIPLIER = 2
+Stemming: Porter 2
+
+Average accuracy: 0.85
+Standard deviation: 0.01
+Min accuracy: 0.83
+Max accuracy: 0.89
+Notes:
+Stemming hurt accuracy, as I thought it might. Also hurts runtime, obviously. Should either go with a light stemmer or no
+stemmer.
