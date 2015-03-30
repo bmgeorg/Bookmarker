@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+//stateless
 public class Tokenizer {
 	//ignored words
 	Set<String> stopwords = new HashSet<String>();
