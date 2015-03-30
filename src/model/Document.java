@@ -7,15 +7,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.jsoup.Jsoup;
+import org.jsoup.select.Elements;
 
 public class Document {
 	//the actual base uri of a page (after redirection) retrieved from jsoup doc
 	private String baseURI; //example: http://www.stackoverflow.com/questions/how-do-you-do-this.html
 	private String domain; //example: stackoverflow.com
-	private static final double DEFAULT_WEIGHT = 1;
-	private static final double TWO_GRAM_WEIGHT = 2;
+	private static final double TEXT_WEIGHT= 1;
 	private static final double TITLE_WEIGHT = 3;
-	private static final double TWO_GRAM_TITLE_WEIGHT = 2;
+	private static final double META_DESCRIPTION_WEIGHT = 1;
+	private static final double TWO_GRAM_WEIGHT_MULTIPLIER = 2; //the weight of a 2-gram is [WEIGHT]*TWO_GRAM_WEIGHT_MULTIPLIER
 	//totalWeight = the sum of weights for all terms in rawTermWeights
 	private double totalWeight;
 	//the non-normalized weight for a term; will be normalized by 1/totalWeight
@@ -33,17 +34,13 @@ public class Document {
 		this.jsoupDoc = jsoupDoc;
 		totalWeight = 0;
 
-		//index body
-		index(jsoupDoc.text(), 1, DEFAULT_WEIGHT);
-		index(jsoupDoc.text(), 2, TWO_GRAM_WEIGHT);
-		//index title
-		index(jsoupDoc.title(), 1, TITLE_WEIGHT);
-		index(jsoupDoc.title(), 2, TWO_GRAM_TITLE_WEIGHT);
-		/*//index meta description
-		Elements descriptionMetaTags = jsoupDoc.select("meta[name=description]");
+		index(jsoupDoc.text(), TEXT_WEIGHT);
+		index(jsoupDoc.title(), TITLE_WEIGHT);
+		//index meta description
+		/*Elements descriptionMetaTags = jsoupDoc.select("meta[name=description]");
 		if(descriptionMetaTags.size() > 0) {
-			String description = descriptionMetaTags.first().attr("content");
-			String[] descriptionTokens = new Tokenizer().tokenize(description);
+			String metaDescription = descriptionMetaTags.first().attr("content");
+			index(metaDescription, META_DESCRIPTION_WEIGHT);
 		}*/
 
 		calculateMagnitude();
@@ -89,6 +86,10 @@ public class Document {
 	}
 
 	/* private methods */
+	private void index(String text, double weight) {
+		index(text, 1, weight);
+		index(text, 2, weight*TWO_GRAM_WEIGHT_MULTIPLIER);
+	}
 	private void index(String text, int gramSize, double weight) {
 		if(text == null || text.equals("")) {
 			return;
