@@ -28,20 +28,21 @@ public class Tokenizer {
 		}
 	}
 	
-	private String sanitize(String token) {
+	private String sanitize(String text) {
 		//remove all non-alphabetic, non-hypen, non + characters
-		token = token.replaceAll("[^a-zA-Z\\-\\+]", "");
-		token = token.toLowerCase();
-		return token;
+		text = text.replaceAll("[^a-zA-Z\\-\\+]", " ");
+		text = text.toLowerCase();
+		return text;
 	}
 	
 	public String[] tokenize(String text) {
+		text = sanitize(text);
 		ArrayList<String> tokens = new ArrayList<String>();
 		
 		Pattern pattern = Pattern.compile("\\S+");
 		Matcher matcher = pattern.matcher(text);
 		while(matcher.find()) {
-			String token = sanitize(matcher.group());
+			String token = matcher.group();
 			if(!stopwords.contains(token))
 				tokens.add(token);
 		}
