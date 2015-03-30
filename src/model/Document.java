@@ -18,6 +18,7 @@ public class Document {
 	private static final double META_DESCRIPTION_WEIGHT = 1;
 	private static final double IMAGE_ALT_WEIGHT = 0.5;
 	private static final double H1_EXTRA_WEIGHT = 1;
+	private static final double DOMAIN_TOKEN_WEIGHT = 1;
 	
 	//the weight of a 2-gram is [WEIGHT]*TWO_GRAM_WEIGHT_MULTIPLIER
 	private static final double TWO_GRAM_WEIGHT_MULTIPLIER = 2; 
@@ -63,6 +64,8 @@ public class Document {
 			String h1 = h1s.get(i).text();
 			index(h1, H1_EXTRA_WEIGHT);
 		}
+		//index domain
+		index(this.domain, DOMAIN_TOKEN_WEIGHT);
 		
 		calculateMagnitude();
 	}
@@ -186,7 +189,7 @@ public class Document {
 
 	public static void main(String args[]) throws IOException {
 		Document doc = new Document("http://www.lipsum.com");
-//		doc.printTermWeights();
+		doc.printTermWeights();
 		System.out.println("Done");
 
 		/*DocumentMemento memento = doc.getMemento();
