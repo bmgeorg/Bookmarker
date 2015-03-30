@@ -18,17 +18,23 @@ public class Document {
 	private static final double META_DESCRIPTION_WEIGHT = 1;
 	private static final double IMAGE_ALT_WEIGHT = 0.5;
 	private static final double H1_EXTRA_WEIGHT = 1;
+	
 	//the weight of a 2-gram is [WEIGHT]*TWO_GRAM_WEIGHT_MULTIPLIER
 	private static final double TWO_GRAM_WEIGHT_MULTIPLIER = 2; 
+	
 	//totalWeight = the sum of weights for all terms in rawTermWeights
 	private double totalWeight;
-	//the non-normalized weight for a term; will be normalized by 1/totalWeight
+	
+	//the non-normalized weights for terms; will be normalized by 1/totalWeight
 	private HashMap<String, Double> rawTermWeights = new HashMap<String, Double>();
+	
 	//magnitude: the magnitude of the term weight vector in the vector space model
 	private double magnitude;
+	
 	//the jsoup representation of the Document
 	//eventually we should probably remove this for memory conservation, but it is useful for testing
 	private org.jsoup.nodes.Document jsoupDoc;
+	
 	private Tokenizer tokenizer = new Tokenizer();
 
 	private void setup(org.jsoup.nodes.Document jsoupDoc) {
@@ -86,7 +92,6 @@ public class Document {
 	public Iterator<String> termIterator() {
 		return rawTermWeights.keySet().iterator();
 	}
-
 	//weight is proportion of term's weight in totalWeight
 	//weight is in [0, 1]
 	public double weightForTerm(String term) {
