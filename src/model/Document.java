@@ -17,6 +17,7 @@ public class Document {
 	private static final double TITLE_WEIGHT = 3;
 	private static final double META_DESCRIPTION_WEIGHT = 1;
 	private static final double IMAGE_ALT_WEIGHT = 0.5;
+	private static final double H1_EXTRA_WEIGHT = 1;
 	//the weight of a 2-gram is [WEIGHT]*TWO_GRAM_WEIGHT_MULTIPLIER
 	private static final double TWO_GRAM_WEIGHT_MULTIPLIER = 2; 
 	//totalWeight = the sum of weights for all terms in rawTermWeights
@@ -44,11 +45,17 @@ public class Document {
 			String description = descriptionTags.get(i).attr("content");
 			index(description, META_DESCRIPTION_WEIGHT);
 		}
-		//index alt tags
+		//index image alt attributes
 		Elements images = jsoupDoc.getElementsByTag("img");
 		for(int i = 0; i < images.size(); i++) {
 			String alt = images.get(i).attr("alt");
 			index(alt, IMAGE_ALT_WEIGHT);
+		}
+		//index h1 tags
+		Elements h1s = jsoupDoc.getElementsByTag("h1");
+		for(int i = 0; i < h1s.size(); i++) {
+			String h1 = h1s.get(i).text();
+			index(h1, H1_EXTRA_WEIGHT);
 		}
 		
 		calculateMagnitude();
@@ -173,8 +180,8 @@ public class Document {
 	}
 
 	public static void main(String args[]) throws IOException {
-		Document doc = new Document("http://www.helloworld.com");
-		doc.printTermWeights();
+		Document doc = new Document("http://www.lipsum.com");
+//		doc.printTermWeights();
 		System.out.println("Done");
 
 		/*DocumentMemento memento = doc.getMemento();
