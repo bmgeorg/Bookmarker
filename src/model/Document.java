@@ -37,11 +37,11 @@ public class Document {
 		index(jsoupDoc.text(), TEXT_WEIGHT);
 		index(jsoupDoc.title(), TITLE_WEIGHT);
 		//index meta description
-		/*Elements descriptionMetaTags = jsoupDoc.select("meta[name=description]");
+		Elements descriptionMetaTags = jsoupDoc.select("meta[name=description]");
 		if(descriptionMetaTags.size() > 0) {
 			String metaDescription = descriptionMetaTags.first().attr("content");
 			index(metaDescription, META_DESCRIPTION_WEIGHT);
-		}*/
+		}
 
 		calculateMagnitude();
 	}
