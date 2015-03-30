@@ -63,7 +63,8 @@ public class Prospector {
 	private Prospect prospect(ArrayList<Category> ore, ArrayList<Category> gold) {
 		Prospect summary = new Prospect(); 
 		summary.numCorrect = 0;
-		summary.totalCount = 0;
+		summary.numOre = 0;
+		summary.numGold = 0;
 		summary.prospects = new ArrayList<CategoryProspect>();
 
 		for(int i = 0; i < ore.size(); i++) {
@@ -91,10 +92,12 @@ public class Prospector {
 			summary.prospects.add(prospect);
 
 			summary.numCorrect += prospect.tp.size();
-			summary.totalCount += oreSet.size();
+			summary.numOre += oreSet.size();
+			summary.numGold += goldSet.size();
 		}
 		
-		summary.accuracy = (double)summary.numCorrect/summary.totalCount;
+		summary.totalRecall = (double)summary.numCorrect/summary.numGold;
+		summary.totalPrecision = (double)summary.numCorrect/summary.numOre;
 		return summary;
 	}
 	private Set<String> intersect(Set<String> a, Set<String> b) {

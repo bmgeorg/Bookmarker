@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Set;
 
 class Prospect {
-	double accuracy;
+	double totalRecall;
+	double totalPrecision;
 	int numCorrect;
-	int totalCount;
+	int numOre;
+	int numGold;
 	ArrayList<CategoryProspect> prospects;
 	
 	@Override
@@ -15,14 +17,12 @@ class Prospect {
 		for(CategoryProspect prospect : prospects) {
 			result += prospect.toString() + "\n";
 		}
-		result += toShortString();
+		result += String.format("Num correct: %d\n", numCorrect);
+		result += String.format("Num ore: %d\n", numOre);
+		result += String.format("Num gold: %d\n", numGold);
+		result += String.format("Total recall: %.2f\n", totalRecall);
+		result += String.format("Total precision: %.2f\n", totalPrecision);
 		return result;
-	}
-	
-	public String toShortString() {
-		return	"Num correct: " + String.valueOf(numCorrect) + "\n" +
-				"Out of: " + String.valueOf(totalCount) + "\n" + 
-				String.format("Accuracy: %.2f\n", accuracy);
 	}
 }
 
@@ -62,18 +62,30 @@ class CategoryProspect {
 }
 
 class ProspectSummary {
-	double avgAccuracy;
-	double minAccuracy;
-	double maxAccuracy;
-	double stdDeviation;
+	double avgRecall;
+	double minRecall;
+	double maxRecall;
+	double stdDevRecall;
+	
+	double avgPrecision;
+	double minPrecision;
+	double maxPrecision;
+	double stdDevPrecision;
 	
 	@Override
 	public String toString() {
 		String result = "";
-		result += String.format("Average accuracy: %.2f\n", avgAccuracy);
-		result += String.format("Standard deviation: %.2f\n", stdDeviation);
-		result += String.format("Min accuracy: %.2f\n", minAccuracy);
-		result += String.format("Max accuracy: %.2f\n", maxAccuracy);
+		
+		result += String.format("Average total recall: %.2f\n", avgRecall);
+		result += String.format("Standard deviation: %.2f\n", stdDevRecall);
+		result += String.format("Min total recall: %.2f\n", minRecall);
+		result += String.format("Max total recall: %.2f\n", maxRecall);
+		
+		result += String.format("Average total precision: %.2f\n", avgPrecision);
+		result += String.format("Standard deviation: %.2f\n", stdDevPrecision);
+		result += String.format("Min total precision: %.2f\n", minPrecision);
+		result += String.format("Max total precision: %.2f\n", maxPrecision);
+		
 		return result;
 	}
 }

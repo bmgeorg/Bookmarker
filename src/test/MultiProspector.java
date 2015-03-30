@@ -17,23 +17,43 @@ public class MultiProspector {
 		
 		//calculate summary
 		ProspectSummary summary = new ProspectSummary();
-		summary.minAccuracy = prospects[0].accuracy;
-		summary.maxAccuracy = prospects[0].accuracy;
-		summary.avgAccuracy = prospects[0].accuracy;
+		summary.minRecall = prospects[0].totalRecall;
+		summary.maxRecall = prospects[0].totalRecall;
+		summary.avgRecall = prospects[0].totalRecall;
+		summary.minPrecision = prospects[0].totalPrecision;
+		summary.maxPrecision = prospects[0].totalPrecision;
+		summary.avgPrecision = prospects[0].totalPrecision;
 		for(int i = 1; i < prospects.length; i++) {
-			if(prospects[i].accuracy < summary.minAccuracy)
-				summary.minAccuracy = prospects[i].accuracy;
-			if(prospects[i].accuracy > summary.maxAccuracy)
-				summary.maxAccuracy = prospects[i].accuracy;
-			summary.avgAccuracy += prospects[i].accuracy;
+			if(prospects[i].totalRecall < summary.minRecall)
+				summary.minRecall = prospects[i].totalRecall;
+			if(prospects[i].totalRecall > summary.maxRecall)
+				summary.maxRecall = prospects[i].totalRecall;
+			summary.avgRecall += prospects[i].totalRecall;
+			
+			if(prospects[i].totalPrecision < summary.minPrecision)
+				summary.minPrecision = prospects[i].totalPrecision;
+			if(prospects[i].totalPrecision > summary.maxPrecision)
+				summary.maxPrecision = prospects[i].totalPrecision;
+			summary.avgPrecision += prospects[i].totalPrecision;
 		}
-		summary.avgAccuracy = summary.avgAccuracy/prospects.length;
-		summary.stdDeviation = 0;
+		summary.avgRecall /= prospects.length;
+		summary.avgPrecision /= prospects.length; 
+		
+		//compute recall standard deviation
+		summary.stdDevRecall = 0;
 		for(int i = 0; i < prospects.length; i++) {
-			summary.stdDeviation += (summary.avgAccuracy - prospects[i].accuracy)*(summary.avgAccuracy - prospects[i].accuracy);
+			summary.stdDevRecall += (summary.avgRecall - prospects[i].totalRecall)*(summary.avgRecall - prospects[i].totalRecall);
 		}
-		summary.stdDeviation /= prospects.length;
-		summary.stdDeviation = Math.sqrt(summary.stdDeviation);
+		summary.stdDevRecall /= prospects.length;
+		summary.stdDevRecall = Math.sqrt(summary.stdDevRecall);
+		
+		//compute precision standard deviation
+		summary.stdDevPrecision = 0;
+		for(int i = 0; i < prospects.length; i++) {
+			summary.stdDevPrecision += (summary.avgPrecision - prospects[i].totalPrecision)*(summary.avgPrecision - prospects[i].totalPrecision);
+		}
+		summary.stdDevPrecision /= prospects.length;
+		summary.stdDevPrecision = Math.sqrt(summary.stdDevPrecision);
 		
 		return summary;
 	}
