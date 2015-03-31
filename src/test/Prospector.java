@@ -46,6 +46,7 @@ public class Prospector {
 		}
 
 		ArrayList<Category> ore = bookmarker.getCategories();
+		ore.add(bookmarker.getUnsortedCategory());
 
 		//sort ore and gold categories to be in same order
 		Comparator<Category> catComp = new Comparator<Category>() {

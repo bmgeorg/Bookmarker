@@ -70,9 +70,14 @@ public class DataLoader {
 			if(categoryName == null)
 				return null;
 
-			//get tags
-			String tagsLine = br.readLine();
-			tags = new Tokenizer().tokenize(tagsLine);
+			//get tags for any category except "Unsorted"
+			if(categoryName.equals("Unsorted")) {
+				//no tags for unsorted category
+				tags = new String[0];
+			} else {
+				String tagsLine = br.readLine();
+				tags = new Tokenizer().tokenize(tagsLine);
+			}
 		} catch(IOException e) {
 			e.printStackTrace();
 			System.exit(1);
@@ -212,6 +217,11 @@ public class DataLoader {
 	 * url4
 	 * url5
 	 * url6
+	 * 
+	 * Unsorted
+	 * url7
+	 * url8
+	 * url9
 	 */
 	public static ArrayList<Category> loadGold(String fileName, boolean useCachedDocs) {
 		ArrayList<Category> categories = new ArrayList<Category>();

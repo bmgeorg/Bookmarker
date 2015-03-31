@@ -35,7 +35,7 @@ public class Investigator {
 	}
 	
 	public static void main(String args[]) {
-		BookmarkReport report = new Investigator().investigate("http://docs.oracle.com/javase/tutorial/uiswing/components/scrollpane.html", "categories.txt", "urls.txt", true);
+		BookmarkReport report = new Investigator().investigate("http://protractor.ninja/", "categories.txt", "urls.txt", true);
 		System.out.println(report.toString());
 	}
 }

@@ -13,6 +13,7 @@ public class CategoryReport {
 		this.docWeights = docWeights;
 		
 		//sort tags and docweights by tag weight
+		//selection sort
 		for(int i = 0; i < tags.length; i++) {
 			int max = i;
 			for(int j = i+1; j < tags.length; j++) {

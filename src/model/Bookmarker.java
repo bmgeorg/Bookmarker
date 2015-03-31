@@ -10,7 +10,10 @@ public class Bookmarker {
 	 * add a document to all categories with scores >= MULTIPLE_CATEGORY_THRESHOLD*(maximum category score)
 	 */
 	private static final double MULTIPLE_CATEGORY_THRESHOLD = 0.7;
+	private static final double UNSORTED_THRESHOLD = 0.01;
+	//contains all categories except unsorted
 	private ArrayList<Category> categories = new ArrayList<Category>();
+	private Category unsorted = new Category("Unsorted");
 
 	public BookmarkReport bookmark(Document doc) {
 		CategoryReport[] categoryReports = new CategoryReport[categories.size()];
@@ -21,21 +24,28 @@ public class Bookmarker {
 		for(int i = 0; i < categories.size(); i++) {
 			categoryReports[i] = categories.get(i).score(doc);
 		}
-		
+
 		//find best score
 		int bestIndex = 0;
 		for(int i = 1; i < categories.size(); i++) {
 			if(categoryReports[i].score >= categoryReports[bestIndex].score)
 				bestIndex = i;
 		}
-		
+
 		double bestScore = categoryReports[bestIndex].score;
-		double threshold = bestScore*MULTIPLE_CATEGORY_THRESHOLD;
-		
-		//add document to all categories with score above threshold
+		double multiCategoryThreshold = bestScore*MULTIPLE_CATEGORY_THRESHOLD;
+
+		//add document to all categories with score above multiCategoryThreshold and UNSORTED_THRESHOLD
 		for(int i = 0; i < categories.size(); i++) {
-			if(categoryReports[i].score >= threshold)
+			if(categoryReports[i].score >= multiCategoryThreshold &&
+				categoryReports[i].score >= UNSORTED_THRESHOLD) {
 				categories.get(i).addDocument(doc);
+			}
+		}
+		
+		//put category in unsorted category if it doesn't match any category
+		if(bestScore < UNSORTED_THRESHOLD) {
+			unsorted.addDocument(doc);
 		}
 
 		return new BookmarkReport(categoryReports);
@@ -43,7 +53,7 @@ public class Bookmarker {
 
 	public void addCategories(ArrayList<Category> newCategories) {
 		for(Category category : newCategories) {
-			categories.add(category);
+			addCategory(category);
 		}
 	}
 
@@ -53,6 +63,10 @@ public class Bookmarker {
 
 	public ArrayList<Category> getCategories() {
 		return categories;
+	}
+
+	public Category getUnsortedCategory() {
+		return unsorted;
 	}
 
 	/* testing */
@@ -65,6 +79,10 @@ public class Bookmarker {
 			cat.printDocumentURLs();
 			System.out.println();
 		}
+		System.out.println(unsorted.getName());
+		unsorted.printAdjustedTagWeights();
+		unsorted.printDocumentURLs();
+		System.out.println();
 	}
 
 	public static void main(String args[]) throws IOException {
