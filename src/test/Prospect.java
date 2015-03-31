@@ -80,6 +80,7 @@ class ProspectSummary {
 		result += String.format("Standard deviation: %.2f\n", stdDevRecall);
 		result += String.format("Min total recall: %.2f\n", minRecall);
 		result += String.format("Max total recall: %.2f\n", maxRecall);
+		result += "\n";
 		
 		result += String.format("Average total precision: %.2f\n", avgPrecision);
 		result += String.format("Standard deviation: %.2f\n", stdDevPrecision);
