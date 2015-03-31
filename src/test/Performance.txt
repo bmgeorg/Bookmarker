@@ -95,3 +95,21 @@ Max accuracy: 0.89
 Notes:
 Stemming hurt accuracy, as I thought it might. Also hurts runtime, obviously. Should either go with a light stemmer or no
 stemmer.
+
+2.1 - Unsorted category
+Params:
+Category: MAX_USER_TAGS = 10, MAX_DISCOVERED_TAGS = 10, WEIGHT_FOR_USER_TAGS = 3, WEIGHT_FOR_USER_TAGS = 3/numUserTags, WEIGHT_PER_MATCHED_DOMAIN = 0.01
+Document: TEXT_WEIGHT = 1, TITLE_WEIGHT = 3, META_DESCRIPTION_WEIGHT = 1, IMAGE_ALT_WEIGHT = 0.5, H1_EXTRA_WEIGHT = 1, DOMAIN_TOKEN_WEIGHT = 1
+TWO_GRAM_WEIGHT_MULTIPLIER = 2
+Bookmarker: UNSORTED_THRESHOLD = 0.01, MULTIPLE_CATEGORY_THRESHOLD = 0.7;
+Stemming: Porter 2
+
+Average total recall: 0.87
+Standard deviation: 0.01
+Min total recall: 0.85
+Max total recall: 0.89
+
+Average total precision: 0.78
+Standard deviation: 0.01
+Min total precision: 0.75
+Max total precision: 0.83
