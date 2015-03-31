@@ -4,6 +4,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class Bookmarker {
+	/*
+	 * a constant used for multiple categorization
+	 * MULTIPLE_CATEGORY_THRESHOLD is in [0, 1]
+	 * add a document to all categories with scores >= MULTIPLE_CATEGORY_THRESHOLD*(maximum category score)
+	 */
+	private static final double MULTIPLE_CATEGORY_THRESHOLD = 0.7;
 	private ArrayList<Category> categories = new ArrayList<Category>();
 
 	public BookmarkReport bookmark(Document doc) {
@@ -12,15 +18,26 @@ public class Bookmarker {
 		if(categories.size() == 0)
 			return null;
 
-		int best = 0;
 		for(int i = 0; i < categories.size(); i++) {
 			categoryReports[i] = categories.get(i).score(doc);
-			if(categoryReports[i].score > categoryReports[best].score) {
-				best = i;
-			}
+		}
+		
+		//find best score
+		int bestIndex = 0;
+		for(int i = 1; i < categories.size(); i++) {
+			if(categoryReports[i].score >= categoryReports[bestIndex].score)
+				bestIndex = i;
+		}
+		
+		double bestScore = categoryReports[bestIndex].score;
+		double threshold = bestScore*MULTIPLE_CATEGORY_THRESHOLD;
+		
+		//add document to all categories with score above threshold
+		for(int i = 0; i < categories.size(); i++) {
+			if(categoryReports[i].score >= threshold)
+				categories.get(i).addDocument(doc);
 		}
 
-		categories.get(best).addDocument(doc);
 		return new BookmarkReport(categoryReports);
 	}
 
