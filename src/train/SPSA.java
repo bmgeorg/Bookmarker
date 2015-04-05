@@ -10,7 +10,7 @@ import java.util.Random;
  * James C. Spall
  */
 public class SPSA implements Trainer {
-	final double a = 0, c = 0, A = 0, alpha = 0, gamma = 0;
+	final double a = 3, c = 1, A = 5, alpha = 0.602, gamma = 0.101;
 	final int NUM_ITERATIONS = 100;
 	
 
@@ -28,7 +28,7 @@ public class SPSA implements Trainer {
 		double[] thetaMinus = new double[len];
 		double[] ghat = new double[len];
 		
-		for(int k = 0; k < NUM_ITERATIONS; k++) {
+		for(int k = 1; k <= NUM_ITERATIONS; k++) {
 			ak = a/Math.pow(k+A, alpha);
 			ck = c/Math.pow(k, gamma);
 			
