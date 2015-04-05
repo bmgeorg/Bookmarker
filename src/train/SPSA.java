@@ -18,36 +18,35 @@ public class SPSA implements Trainer {
 	public double[] train(Model model) {
 		double[] theta = Arrays.copyOf(model.getInitialParameters(), model.getInitialParameters().length);
 		
+		int len = theta.length;
+		double ak;
+		double ck;
+		double yplus;
+		double yminus;
+		double[] delta;
+		double[] thetaPlus = new double[len];
+		double[] thetaMinus = new double[len];
+		double[] ghat = new double[len];
+		
 		for(int k = 0; k < NUM_ITERATIONS; k++) {
-			final double ak = a/Math.pow(k+A, alpha);
-			final double ck = c/Math.pow(k, gamma);
-			double[] delta = bernoulli(theta.length);
-			double[] thetaPlus = transform(theta, delta, new BinaryOperator() {
-				@Override
-				public double apply(double a, double b) {
-					return a + ck*b;
-				}
-			});
-			double[] thetaMinus = transform(theta, delta, new BinaryOperator() {
-				@Override
-				public double apply(double a, double b) {
-					return a - ck*b;
-				}
-			});
-			final double yplus = model.loss(thetaPlus);
-			final double yminus = model.loss(thetaMinus);
-			double[] ghat = transform(delta, new UnaryOperator() {
-				@Override
-				public double apply(double a) {
-					return (yplus-yminus)/(2*ck*a);
-				}
-			});
-			theta = transform(theta, ghat, new BinaryOperator() {
-				@Override
-				public double apply(double a, double b) {
-					return a - ak*b;
-				}
-			});
+			ak = a/Math.pow(k+A, alpha);
+			ck = c/Math.pow(k, gamma);
+			
+			delta = bernoulli(len);
+			
+			for(int i = 0; i < len; i++)
+				thetaPlus[i] = theta[i] + ck*delta[i];
+			for(int i = 0; i < len; i++)
+				thetaPlus[i] = theta[i] - ck*delta[i];
+			
+			yplus = model.loss(thetaPlus);
+			yminus = model.loss(thetaMinus);
+			
+			for(int i = 0; i < len; i++)
+				ghat[i] = (yplus-yminus)/(2*ck*delta[i]);
+			
+			for(int i = 0; i < len; i++)
+				theta[i] = theta[i] + ak*ghat[i];
 		}
 		
 		return theta;
@@ -60,33 +59,6 @@ public class SPSA implements Trainer {
 		Random rand = new Random();
 		for(int i = 0; i < length; i++)
 			result[i] = rand.nextInt(2) - 1;
-		
-		return result;
-	}
-	
-	/* Array Manipulations - for performing +-/* on entire arrays */
-	private interface UnaryOperator {
-		double apply(double a);
-	}
-	
-	private interface BinaryOperator {
-		double apply(double a, double b);
-	}
-	
-	private double[] transform(double[] a, UnaryOperator operator) {
-		double[] result = new double[a.length];
-		
-		for(int i = 0; i < a.length; i++)
-			result[i] = operator.apply(a[i]);
-		
-		return result;
-	}
-	
-	private double[] transform(double[] a, double[] b, BinaryOperator operator) {
-		double[] result = new double[a.length];
-		
-		for(int i = 0; i < a.length; i++)
-			result[i] = operator.apply(a[i], b[i]);
 		
 		return result;
 	}
