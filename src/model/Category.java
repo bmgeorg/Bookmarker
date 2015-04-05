@@ -17,10 +17,6 @@ import test.DataLoader;
 public class Category implements Serializable {
 	private static final long serialVersionUID = -456116242689353233L;
 	private String name;
-	private static final int MAX_USER_TAGS = 10;
-	private static final int MAX_DISCOVERED_TAGS = 10;
-	private static final double WEIGHT_FOR_USER_TAGS = 3; //will be scaled down by number of user tags
-	private static final double WEIGHT_PER_MATCHED_DOMAIN = 0.01; //not scaled down
 	/*
 	 * All tags hold non-normalized tag weights. The non-normalized tag weight for a term is simply the sum of
 	 * weights for the term from all documents and user tags.
@@ -53,7 +49,7 @@ public class Category implements Serializable {
 		}
 	}
 	private PriorityQueue<Tag> discoveredTags=
-			new PriorityQueue<Tag>(MAX_DISCOVERED_TAGS, new TagComparator());
+			new PriorityQueue<Tag>(Parameterizer.MAX_DISCOVERED_TAGS, new TagComparator());
 	/*
 	 * For weighting by domain
 	 * maps domain name to number of times domain occurs in Category
@@ -63,7 +59,7 @@ public class Category implements Serializable {
 
 	public Category(String name, String... tags) {
 		assert name != null;
-		assert tags.length <= MAX_USER_TAGS;
+		assert tags.length <= Parameterizer.MAX_USER_TAGS;
 		this.name = name;
 
 		Set<String> tempTags = new HashSet<String>();
@@ -74,11 +70,11 @@ public class Category implements Serializable {
 		//tokenize name and add tags as long as there is room
 		String[] nameTags = new Tokenizer().tokenize(name);
 		for(int i = 0; i < nameTags.length; i++)
-			if(tempTags.size() < MAX_USER_TAGS)
+			if(tempTags.size() < Parameterizer.MAX_USER_TAGS)
 				tempTags.add(nameTags[i]);
 
 		//add tags from tempTags
-		double weight = WEIGHT_FOR_USER_TAGS/tempTags.size();
+		double weight = Parameterizer.WEIGHT_FOR_USER_TAGS/tempTags.size();
 		Iterator<String> iter = tempTags.iterator();
 		while(iter.hasNext()) {
 			String term = iter.next();
@@ -129,9 +125,9 @@ public class Category implements Serializable {
 				//add weights from docs
 				for(int i = 0; i < docs.size(); i++)
 					weight += docs.get(i).weightForTerm(term);
-				if(discoveredTags.size() < MAX_DISCOVERED_TAGS || weight > discoveredTags.peek().getWeight()) {
+				if(discoveredTags.size() < Parameterizer.MAX_DISCOVERED_TAGS || weight > discoveredTags.peek().getWeight()) {
 					//remove min if already at tag cap
-					if(discoveredTags.size() == MAX_DISCOVERED_TAGS)
+					if(discoveredTags.size() == Parameterizer.MAX_DISCOVERED_TAGS)
 						discoveredTags.remove();
 					//remove tag if it exists
 					discoveredTags.remove(new Tag(term, 0.0));
@@ -172,7 +168,7 @@ public class Category implements Serializable {
 		//Score domain name matches
 		String domain = doc.getDomain();
 		if(domain != null && domains.containsKey(domain)) {
-			double addedWeight = WEIGHT_PER_MATCHED_DOMAIN*domains.get(domain);
+			double addedWeight = Parameterizer.WEIGHT_PER_MATCHED_DOMAIN*domains.get(domain);
 			pSqrMagnitude += addedWeight;
 			qSqrMagnitude += addedWeight;
 			qdotp += addedWeight*addedWeight;

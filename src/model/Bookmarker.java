@@ -4,13 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class Bookmarker {
-	/*
-	 * a constant used for multiple categorization
-	 * MULTIPLE_CATEGORY_THRESHOLD is in [0, 1]
-	 * add a document to all categories with scores >= MULTIPLE_CATEGORY_THRESHOLD*(maximum category score)
-	 */
-	private static final double MULTIPLE_CATEGORY_THRESHOLD = 0.7;
-	private static final double UNSORTED_THRESHOLD = 0.01;
 	//contains all categories except unsorted
 	private ArrayList<Category> categories = new ArrayList<Category>();
 	private Category unsorted = new Category("Unsorted");
@@ -33,18 +26,18 @@ public class Bookmarker {
 		}
 
 		double bestScore = categoryReports[bestIndex].score;
-		double multiCategoryThreshold = bestScore*MULTIPLE_CATEGORY_THRESHOLD;
+		double multiCategoryThreshold = bestScore*Parameterizer.MULTIPLE_CATEGORY_THRESHOLD;
 
 		//add document to all categories with score above multiCategoryThreshold and UNSORTED_THRESHOLD
 		for(int i = 0; i < categories.size(); i++) {
 			if(categoryReports[i].score >= multiCategoryThreshold &&
-				categoryReports[i].score >= UNSORTED_THRESHOLD) {
+				categoryReports[i].score >= Parameterizer.UNSORTED_THRESHOLD) {
 				categories.get(i).addDocument(doc);
 			}
 		}
 		
 		//put category in unsorted category if it doesn't match any category
-		if(bestScore < UNSORTED_THRESHOLD) {
+		if(bestScore < Parameterizer.UNSORTED_THRESHOLD) {
 			unsorted.addDocument(doc);
 		}
 

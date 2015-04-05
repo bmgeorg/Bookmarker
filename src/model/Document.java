@@ -13,15 +13,6 @@ public class Document {
 	//the actual base uri of a page (after redirection) retrieved from jsoup doc
 	private String baseURI; //example: http://www.stackoverflow.com/questions/how-do-you-do-this.html
 	private String domain; //example: stackoverflow.com
-	private static final double TEXT_WEIGHT= 1;
-	private static final double TITLE_WEIGHT = 3;
-	private static final double META_DESCRIPTION_WEIGHT = 1;
-	private static final double IMAGE_ALT_WEIGHT = 0.5;
-	private static final double H1_EXTRA_WEIGHT = 1;
-	private static final double DOMAIN_TOKEN_WEIGHT = 1;
-	
-	//the weight of a 2-gram is [WEIGHT]*TWO_GRAM_WEIGHT_MULTIPLIER
-	private static final double TWO_GRAM_WEIGHT_MULTIPLIER = 2; 
 	
 	//totalWeight = the sum of weights for all terms in rawTermWeights
 	private double totalWeight;
@@ -44,28 +35,28 @@ public class Document {
 		this.jsoupDoc = jsoupDoc;
 		totalWeight = 0;
 
-		index(jsoupDoc.text(), TEXT_WEIGHT);
-		index(jsoupDoc.title(), TITLE_WEIGHT);
+		index(jsoupDoc.text(), Parameterizer.TEXT_WEIGHT);
+		index(jsoupDoc.title(), Parameterizer.TITLE_WEIGHT);
 		//index meta description
 		Elements descriptionTags = jsoupDoc.select("meta[name=description]");
 		for(int i = 0; i < descriptionTags.size(); i++) {
 			String description = descriptionTags.get(i).attr("content");
-			index(description, META_DESCRIPTION_WEIGHT);
+			index(description, Parameterizer.META_DESCRIPTION_WEIGHT);
 		}
 		//index image alt attributes
 		Elements images = jsoupDoc.getElementsByTag("img");
 		for(int i = 0; i < images.size(); i++) {
 			String alt = images.get(i).attr("alt");
-			index(alt, IMAGE_ALT_WEIGHT);
+			index(alt, Parameterizer.IMAGE_ALT_WEIGHT);
 		}
 		//index h1 tags
 		Elements h1s = jsoupDoc.getElementsByTag("h1");
 		for(int i = 0; i < h1s.size(); i++) {
 			String h1 = h1s.get(i).text();
-			index(h1, H1_EXTRA_WEIGHT);
+			index(h1, Parameterizer.H1_EXTRA_WEIGHT);
 		}
 		//index domain
-		index(this.domain, DOMAIN_TOKEN_WEIGHT);
+		index(this.domain, Parameterizer.DOMAIN_TOKEN_WEIGHT);
 		
 		calculateMagnitude();
 	}
@@ -111,7 +102,7 @@ public class Document {
 	/* private methods */
 	private void index(String text, double weight) {
 		index(text, 1, weight);
-		index(text, 2, weight*TWO_GRAM_WEIGHT_MULTIPLIER);
+		index(text, 2, weight*Parameterizer.TWO_GRAM_WEIGHT_MULTIPLIER);
 	}
 	private void index(String text, int gramSize, double weight) {
 		if(text == null || text.equals("")) {
